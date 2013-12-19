@@ -14,6 +14,8 @@ public:
     static const int fps;
     static const int ups;
     static const int ups_delta_time;
+
+    static int time_since_last_frame;
 private:
     virtual void abstract()=0;
 };

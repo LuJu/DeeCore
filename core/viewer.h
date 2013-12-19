@@ -80,6 +80,8 @@ protected :
 
     //! Timer used for FPS count
     QTimer * _timer_fps;
+    QTimer * _timer_start;
+    QTime _time;
     int _background_position;
     bool _background_activated;
 

@@ -7,6 +7,7 @@ using namespace std;
 
 Viewer::~Viewer(){
     delete _timer_fps;
+    delete _timer_start;
 }
 
 void Viewer::draw()
@@ -174,10 +175,11 @@ void Viewer::init()
     _frame=0;
     _background_activated=true;
 
-    QTimer *timer_start = new QTimer(this);
-    connect(timer_start, SIGNAL(timeout()), this, SLOT(animate()));
-    timer_start->start(Timing::fps_delta_time);
+    _timer_start = new QTimer(this);
+    connect(_timer_start, SIGNAL(timeout()), this, SLOT(animate()));
+    _timer_start->start(Timing::fps_delta_time);
 
+    _time.start();
     QMatrix4x4 P;
     P.ortho(-1,1,-1,1,-1,1);
     _ui->set_projection(P);
@@ -191,6 +193,7 @@ void Viewer::animate(){
 void Viewer::frameEnd(){
     Debugger::promptOpenGLError();
     _frame++;
+    Timing::time_since_last_frame=_time.elapsed()-Timing::time_since_last_frame;
     _ui->updateState();
 }
 

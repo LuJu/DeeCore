@@ -2,16 +2,18 @@
 
 UIState::UIState():QObject()
 {
-    _level=0;
-    _zoom_targeted=_level;
-    _zoom=GlobalConfig::get_int("zoom");
-    _step=4;
     _action_done=false;
     for (int i=0;i<NUMBER_OF_ACTIONS;i++) _actions[i]=false;
+    _paused=false;
+    loadPreviousState();
+    _zoom_targeted=_zoom_level;
+}
+
+void UIState::loadPreviousState(){
     _rotate=Point3di(GlobalConfig::get_int("rotate_x"),
                      GlobalConfig::get_int("rotate_y"),
                      GlobalConfig::get_int("rotate_z"));
-    _paused=false;
+    _zoom_level=GlobalConfig::get_int("zoom");
 }
 
 UIState * UIState::instance(){
@@ -22,38 +24,10 @@ UIState * UIState::instance(){
 UIState::~UIState(){
 }
 
-void UIState::timeOutSlot()
-{
-    updateState();
-}
-
-
-void UIState::requireLevelChange(int delta)
-{
-//    _zoom_targeted += delta/20;
-//    if(_zoom_targeted > 100 ) _zoom_targeted = 100;
-//    if(_zoom_targeted < 0) _zoom_targeted = 0;
-//    qDebug()<<"Zoom : "<<_zoom_targeted;
-//    if(delta >0 &&_level <_tree->get_number_of_levels() || delta < 0 && _level > 0){
-//        _level+=delta;
-        if(delta > 0)
-            _action_done=forward;
-        else if (delta<0)
-            _action_done=backward;
-        else _action_done=none;
-//    }
-
-}
-
-void UIState::updateState(){
-    if(!_paused)
-        actionProcess();
-}
-
 void UIState::changeZoom(int delta){
-    if(_zoom+delta > 10000)     _zoom = 10000 ;
-    else if (_zoom+delta < 0) _zoom = 0 ;
-    else _zoom = _zoom+delta;
+    if(_zoom_level+delta > 10000)     _zoom_level = 10000 ;
+    else if (_zoom_level+delta < 0) _zoom_level = 0 ;
+    else _zoom_level = _zoom_level+delta;
 }
 
 
@@ -72,6 +46,10 @@ void UIState::rotate(QPoint mouse_coordinates){
     else rotation.rotate(yangle,1,0,0);
 
     _rotation = _rotation* rotation.transposed() ;
+}
+
+void UIState::updateState(){
+    actionProcess();
 }
 
 void UIState::actionProcess(){
@@ -125,7 +103,7 @@ void UIState::saveState(){
     GlobalConfig::set_int("rotate_x",_rotate.x());
     GlobalConfig::set_int("rotate_y",_rotate.y());
     GlobalConfig::set_int("rotate_z",_rotate.z());
-    GlobalConfig::set_int("zoom",_zoom);
+    GlobalConfig::set_int("zoom",_zoom_level);
 }
 
 bool UIState::action_going (int action){

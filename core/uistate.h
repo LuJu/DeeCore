@@ -6,10 +6,14 @@
 #include <QTimer>
 #include <QObject>
 #include <QPoint>
-#include "timing.h"
-#include "globalconfig.h"
+
 #include "utils/maths.h"
 #include "utils/typedefinitions.h"
+
+#include "timing.h"
+#include "globalconfig.h"
+#include "camera.h"
+
 //! class defining the state of the UI (zoom, x, y...)
 /*!
     \n Status  1 : not implemented
@@ -18,7 +22,6 @@ class UIState : public QObject
 {
     Q_OBJECT
 public slots:
-    virtual void timeOutSlot();
 public:
     enum Actions {
         left, right, up, down,
@@ -31,24 +34,14 @@ public:
     /*!
         The zoom value goes from 0 to 1000
     */
-    inline int get_zoom(){return _zoom;}
+    inline int get_zoom(){return _zoom_level;}
     Point3d<float> get_position() const {return _position;}
     void set_position(Point3df position){_position = position;}
     Point3df get_previous_position() const {return _previous_position;}
     void set_previous_position(Point3df previous_position){_previous_position = previous_position;}
-    inline void set_level(int level){_level=level;}
-//    inline void set_tree(WTree * tree){_tree=tree;}
     inline QPoint get_mouse_position(){return _mouse_pos;}
     inline void set_mouse_position(QPoint mouse_pos){ _mouse_pos=mouse_pos;}
     inline int recordAction(){int ret = _action_done; _action_done=none; return ret;}
-    //! updates per second
-    /*!
-        Determines the number of times per second the method updateState() will be called .
-        The value must be set before calling start() method to work
-        \n Status  1 : not implemented
-        \param  ups : the new number of images per second
-    */
-    inline void set_ups(qint16 ups){_ups=ups;}
     inline void set_action(quint8 id, bool action){if(id<NUMBER_OF_ACTIONS)_actions[id]=action;}
 
     //! Change the zoom value
@@ -72,18 +65,19 @@ public:
     void changeZoom(int delta);
 
 
-    QMatrix4x4& get_projection() {return _projection;}
-    QMatrix4x4& get_view() {return _view;}
-    void set_view(QMatrix4x4 view){_view=view;}
-    void set_projection(QMatrix4x4 projection){_projection=projection;}
+    const QMatrix4x4& get_projection() {return _camera.get_projection_matrix();}
+    const QMatrix4x4& get_view() {return _camera.get_view_matrix();}
+    void set_view(QMatrix4x4 view){_camera.set_view_matrix(view);}
+    void set_projection(QMatrix4x4 projection){_camera.set_projection_matrix(projection);}
     QMatrix4x4 _rotation;
     QQuaternion _quaternion;
     void rotate(QPoint mouse_coordinates);
+    void loadPreviousState();
 private:
 
 
-    QMatrix4x4 _projection;
-    QMatrix4x4 _view;
+//    QMatrix4x4 _projection;
+//    QMatrix4x4 _view;
     UIState();
     UIState(const UIState&);
     ~UIState();
@@ -96,16 +90,15 @@ private:
     Point3df _position;
     Point3df _previous_position;
     Point3di _rotate;
-    int _level;
+
     int _zoom_targeted;
-    int _zoom;
-    int _step;
-    int _ups;
+    int _zoom_level;
     bool _actions[NUMBER_OF_ACTIONS];
     int _action_done;
     QPoint _mouse_pos;
     bool _paused;
 
+    Camera _camera;
 };
 
 #endif // UISTATE_H
