@@ -5,24 +5,6 @@ QHash<QString,int> GlobalConfig::_int;
 QHash<QString,QString> GlobalConfig::_string;
 QSettings GlobalConfig::_settings("Windel", "ETS");
 
-const std::string GlobalConfig::_assets_path="../assets/";
-
-const char *GlobalConfig::find_asset_path(std::string asset){
-    const char * path=(_assets_path+asset).c_str();
-    return path;
-}
-
-const QString GlobalConfig::find_asset_path_qstring(QString asset){
-    QString path(_assets_path.c_str());
-    path.append(asset);
-    return path;
-}
-
-const QString GlobalConfig::find_option_path(QString option){
-    QString asset = get_string(QString(option));
-    return find_asset_path_qstring(asset);
-}
-
 bool GlobalConfig::openGLSupport(const char * extension){
     const char *exts = (char*)glGetString(GL_EXTENSIONS);
     QString s(exts);

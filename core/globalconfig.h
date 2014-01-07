@@ -13,11 +13,6 @@ class GlobalConfig
 {
 public:
     static QSettings _settings;
-    static const std::string _assets_path;
-    // returns the path of the assets of the program
-    static const char * find_asset_path(std::string asset);
-    static const QString find_asset_path_qstring(QString asset);
-    static const QString find_option_path(QString option);
     static const QString get_date_time(){return QDateTime::currentDateTime().toString("yy.MM.dd_hh'h'mm");}
     static bool openGLSupport(const char * extension);
     static void saveConfiguration();
@@ -35,6 +30,7 @@ public:
     static QString get_string(QString data){ return _string["string/"+data] ;}
     static void set_string(QString data, QString value){ _string["string/"+data]=value;}
     static void parseArguments(int argc, char *argv[]);
+
 private:
     virtual void abstract()=0;
     static QHash<QString,bool> _bool;

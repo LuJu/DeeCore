@@ -69,9 +69,7 @@ void Viewer::startShaders(){
 
 QGLShader * Viewer::compileShader(const char * path, QGLShader::ShaderType type){
     QGLShader * shader;
-    QFile shaderf(GlobalConfig::find_asset_path(path));
-    qDebug()<<GlobalConfig::find_asset_path(path);
-    qDebug()<<shaderf.exists();
+    QFile shaderf(":/"+QString(path));
     if (shaderf.open(QIODevice::ReadOnly)){
         QByteArray qvs = shaderf.readAll();
         shaderf.close();
@@ -221,8 +219,8 @@ void Viewer::loadTexture(const QString &textureName)
 
 void Viewer::loadTextures(QStringList &list){
     for (int i = 0; i < list.size(); ++i) {
-        string asset=list.at(i).toStdString();
-        loadTexture(GlobalConfig::find_asset_path(asset));
+        QString asset=list.at(i);
+        loadTexture(asset);
     }
 }
 
