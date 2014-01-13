@@ -8,6 +8,9 @@ using namespace std;
 Viewer::~Viewer(){
     delete _timer_fps;
     delete _timer_start;
+    for (int i = 0; i < 3; ++i) {
+        if (_shaders[i]) delete _shaders[i];
+    }
 }
 
 void Viewer::draw()
@@ -54,13 +57,14 @@ void Viewer::startShaders(){
     if(GlobalConfig::is_enabled("shaders")) {
         _program = new QGLShaderProgram(this);
 
-        QGLShader *vshader = compileShader("shaders/vshader.glsl",QGLShader::Vertex);
-        QGLShader *fshader = compileShader("shaders/fshader.glsl",QGLShader::Fragment);
-//        QGLShader *gshader = compileShader("shaders/gshader.glsl",QGLShader::Geometry);
+        _shaders[0] = compileShader("shaders/vshader.glsl",QGLShader::Vertex);
+        _shaders[1] = compileShader("shaders/fshader.glsl",QGLShader::Fragment);
+//      _shaders[2] = compileShader("shaders/gshader.glsl",QGLShader::Geometry);
+        _shaders[2] = NULL;
 
-        _program->addShader(vshader);
-        _program->addShader(fshader);
-//        _program->addShader(gshader);
+        _program->addShader(_shaders[0]);
+        _program->addShader(_shaders[1]);
+//        _program->addShader(_shaders[2]);
 
         if(_program->link()) qDebug()<<"Link success";
         if(_program->bind()) qDebug()<<"Bind success";

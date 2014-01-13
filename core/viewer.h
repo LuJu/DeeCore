@@ -29,6 +29,7 @@ class Viewer : public QGLWidget
 public:
     Viewer(const QGLFormat &format) : QGLWidget(format){__build();}
     Viewer() : QGLWidget(){__build();}
+//    Viewer(QWidget * parent = 0, const QGLWidget * shareWidget = 0, Qt::WindowFlags f = 0 ) : QGLWidget ( parent, shareWidget,f ){__build();}
     ~Viewer();
 
 public slots :
@@ -95,6 +96,9 @@ private :
     void updateLastMousePosition(const QPoint& position){
         _last_position = position;
     }
+
+    QGLShader * _shaders[3];
+//        QGLShader *
 
 };
 #endif // VIEWER_H

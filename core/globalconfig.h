@@ -6,6 +6,8 @@
 #include <QSettings>
 #include <QString>
 
+#define DEECORE
+
 //! Static class describing the global settings of the program
 /*!
     */
