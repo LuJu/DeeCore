@@ -41,7 +41,6 @@ void UIState::rotate(QPoint mouse_coordinates){
     else rotation.rotate(xangle,0,1,0);
 
     yangle = (float)mouse_coordinates.y()/2;
-    qDebug()<<yangle;
     if( yangle < 0) rotation.rotate(-yangle,-1,0,0);
     else rotation.rotate(yangle,1,0,0);
 

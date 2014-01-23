@@ -54,7 +54,6 @@ void Viewer::resizeGL(int width, int height){
 
 
 void Viewer::startShaders(){
-    if(GlobalConfig::is_enabled("shaders")) {
         _program = new QGLShaderProgram(this);
 
         _shaders[0] = compileShader("shaders/vshader.glsl",QGLShader::Vertex);
@@ -68,7 +67,6 @@ void Viewer::startShaders(){
 
         if(_program->link()) qDebug()<<"Link success";
         if(_program->bind()) qDebug()<<"Bind success";
-    }
 }
 
 QGLShader * Viewer::compileShader(const char * path, QGLShader::ShaderType type){
@@ -168,8 +166,7 @@ void Viewer::init()
     qDebug()<<"GLSL Version  :"<<QString(*glGetString(GL_SHADING_LANGUAGE_VERSION));
     qDebug()<<"FLAGS : "<<(int)QGLFormat::OpenGLVersionFlags();
 
-    if(GlobalConfig::is_enabled("shaders"))
-        startShaders();
+    startShaders();
     _timer_fps= new QTimer();
     _timer_fps->setInterval(1000);
     _timer_fps->connect(_timer_fps, SIGNAL(timeout()),this, SLOT(framepersecond()));
