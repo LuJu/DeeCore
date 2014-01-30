@@ -8,6 +8,7 @@
 #include <qgl.h>
 #include <QtOpenGL>
 #include <QGLWidget>
+#include <QGLContext>
 #include <QGLShaderProgram>
 #include <QGLShader>
 #include <QVector3D>
@@ -27,10 +28,12 @@ class Viewer : public QGLWidget
 {
     Q_OBJECT
 public:
-    Viewer(const QGLFormat &format) : QGLWidget(format){__build();}
-    Viewer() : QGLWidget(){__build();}
+    Viewer(const QGLFormat &format);
+    Viewer(QGLContext * context);
+    Viewer();
 //    Viewer(QWidget * parent = 0, const QGLWidget * shareWidget = 0, Qt::WindowFlags f = 0 ) : QGLWidget ( parent, shareWidget,f ){__build();}
     ~Viewer();
+    void deleteData();
 
 public slots :
 void framepersecond();
@@ -99,6 +102,8 @@ private :
 
     QGLShader * _shaders[3];
 //        QGLShader *
+
+    bool _initiated;
 
 };
 #endif // VIEWER_H

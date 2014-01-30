@@ -4,12 +4,47 @@ using namespace std;
 //using namespace qglviewer;
 
 
+Viewer::Viewer(const QGLFormat &format) :
+    QGLWidget(format),
+    _ui(NULL),
+    _input(NULL),
+    _timer_fps(NULL),
+    _timer_start(NULL),
+    _initiated(false){
+    __build();
+}
+Viewer::Viewer(QGLContext * context) :
+    QGLWidget(context),
+    _ui(NULL),
+    _input(NULL),
+    _timer_fps(NULL),
+    _timer_start(NULL),
+    _initiated(false){
+    __build();
+}
+Viewer::Viewer() :
+    QGLWidget(),
+    _ui(NULL),
+    _input(NULL),
+    _timer_fps(NULL),
+    _timer_start(NULL),
+    _initiated(false){
+    __build();
+}
 
 Viewer::~Viewer(){
-    delete _timer_fps;
-    delete _timer_start;
-    for (int i = 0; i < 3; ++i) {
-        if (_shaders[i]) delete _shaders[i];
+    deleteData();
+}
+
+void Viewer::deleteData(){
+    if (_initiated){
+        if (_timer_fps) delete _timer_fps;
+        if (_timer_start) delete _timer_start;
+        for (int i = 0; i < 3; ++i) {
+            if (_shaders[i]) delete _shaders[i];
+        }
+        if (_ui) delete _ui;
+        if (_input) delete _input;
     }
 }
 
@@ -21,7 +56,11 @@ void Viewer::draw()
     QMatrix4x4 V;
     _program->setUniformValue("_color",QVector3D(1,1,1));
     float scale = (((float)_ui->get_zoom())/100)+0.5;
-    V.translate( 0,-5.5,1);
+//    V.translate( 0,-5.5,1);
+    V.translate(_ui->get_position().x(),
+                _ui->get_position().y(),
+                _ui->get_position().z());
+
     V.scale(scale,scale,scale);
 //    V.rotate(_ui->get_rotate().x(),1,0,0);
 //    V.rotate(_ui->get_rotate().y(),0,1,0);
@@ -155,17 +194,17 @@ void Viewer::display2D(){
 
 void Viewer::init()
 {
-    _input = InputManager::instance();
-    _ui = UIState::instance();
+    deleteData();
+    _input = new InputManager();
+    _ui = new UIState();
+    _input->set_ui(_ui);
+//    _input = InputManager::instance();
+//    _ui = UIState::instance();
 
     int major,minor;
     glGetIntegerv(GL_MAJOR_VERSION,&major);
     glGetIntegerv(GL_MINOR_VERSION,&minor);
     glClearColor(0.2,0.2,0.2,1);
-    qDebug()<<"OPENGLVersion :"<<major<<"."<<minor;
-    qDebug()<<"GLSL Version  :"<<QString(*glGetString(GL_SHADING_LANGUAGE_VERSION));
-    qDebug()<<"FLAGS : "<<(int)QGLFormat::OpenGLVersionFlags();
-
     startShaders();
     _timer_fps= new QTimer();
     _timer_fps->setInterval(1000);
@@ -183,6 +222,7 @@ void Viewer::init()
     P.ortho(-1,1,-1,1,-1,1);
     _ui->set_projection(P);
     _program->setUniformValue("P",P);
+    _initiated = true;
 }
 
 void Viewer::animate(){

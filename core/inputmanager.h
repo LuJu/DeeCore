@@ -66,9 +66,11 @@ public:
     */
     void resetAssignment();
 
-    static InputManager * instance();
-private:
+//    static InputManager * instance();
     InputManager();
+
+    void set_ui(UIState * ui){_ui = ui;}
+private:
     InputManager(const InputManager&);
 
 

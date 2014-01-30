@@ -60,7 +60,7 @@ public:
     void set_rotate(Point3di rotate){_rotate = rotate;}
 
     void updateState();
-    static UIState * instance();
+//    static UIState * instance();
     void saveState();
     void changeZoom(int delta);
 
@@ -70,17 +70,18 @@ public:
     void set_view(QMatrix4x4 view){_camera.set_view_matrix(view);}
     void set_projection(QMatrix4x4 projection){_camera.set_projection_matrix(projection);}
     QMatrix4x4 _rotation;
+//    QMatrix4x4 _translation;
     QQuaternion _quaternion;
     void rotate(QPoint mouse_coordinates);
     void loadPreviousState();
+    UIState();
+    ~UIState();
 private:
 
 
 //    QMatrix4x4 _projection;
 //    QMatrix4x4 _view;
-    UIState();
     UIState(const UIState&);
-    ~UIState();
     // Private methods
     void actionProcess();
 

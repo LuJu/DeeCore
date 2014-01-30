@@ -1,10 +1,8 @@
 #include "globalconfig.h"
 
-//QHash<QString,bool> GlobalConfig::_bool;
-//QHash<QString,int> GlobalConfig::_int;
-//QHash<QString,QString> GlobalConfig::_string;
 QHash<QString,QVariant> GlobalConfig::_values;
 QSettings* GlobalConfig::_settings = NULL;
+QReadWriteLock GlobalConfig::_lock;
 
 bool GlobalConfig::openGLSupport(const char * extension){
     const char *exts = (char*)glGetString(GL_EXTENSIONS);
@@ -40,12 +38,14 @@ bool GlobalConfig::loadConfiguration(const QString & organization, const QString
     QCoreApplication::setApplicationName(application);
     _settings = new QSettings(organization,application);
 
+    _lock.lockForWrite();
     keys=_settings->allKeys();
     for (int i =0; i < keys.size() ; i++){
         option=keys[i];
         value=_settings->value(keys[i]).toString();
         _values[option]=QVariant(value);
     }
+    _lock.unlock();
     qDebug()<<"Previous configuration loaded";
     return true;
 }
