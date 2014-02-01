@@ -56,9 +56,6 @@ public:
     bool is_paused(){ return _paused;}
     void set_paused(bool paused){_paused=paused;}
 
-    Point3di get_rotate() const {return _rotate;}
-    void set_rotate(Point3di rotate){_rotate = rotate;}
-
     void updateState();
 //    static UIState * instance();
     void saveState();
@@ -69,7 +66,7 @@ public:
     const QMatrix4x4& get_view() {return _camera.get_view_matrix();}
     void set_view(QMatrix4x4 view){_camera.set_view_matrix(view);}
     void set_projection(QMatrix4x4 projection){_camera.set_projection_matrix(projection);}
-    QMatrix4x4 _rotation;
+//    QMatrix4x4 _rotation;
 //    QMatrix4x4 _translation;
     QQuaternion _quaternion;
     void rotate(QPoint mouse_coordinates);
@@ -90,7 +87,6 @@ private:
 
     Point3df _position;
     Point3df _previous_position;
-    Point3di _rotate;
 
     int _zoom_targeted;
     int _zoom_level;

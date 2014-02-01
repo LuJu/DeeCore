@@ -29,6 +29,11 @@ public:
     static int get_int(QString data){ return get_parameter(data).toInt();}
     static void set_int(QString data, int value){set_parameter(data,QVariant(value));}
 
+    static float get_float(QString data){ bool ok = false;
+                                          float value = get_parameter(data).toFloat(&ok);
+                                        return value;}
+    static void set_float(QString data, float value){set_parameter(data,QVariant(value));}
+
     static QString get_string(QString data){ return get_parameter(data).toString();}
     static void set_string(QString data, QString value){set_parameter(data,QVariant(value));}
 

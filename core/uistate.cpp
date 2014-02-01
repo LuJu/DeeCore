@@ -12,16 +12,27 @@ UIState::UIState():
 }
 
 void UIState::loadPreviousState(){
-    _rotate=Point3di(GlobalConfig::get_int("rotate_x"),
-                     GlobalConfig::get_int("rotate_y"),
-                     GlobalConfig::get_int("rotate_z"));
+    _quaternion = _quaternion.fromAxisAndAngle(
+                GlobalConfig::get_float("quaternion_x"),
+                GlobalConfig::get_float("quaternion_y"),
+                GlobalConfig::get_float("quaternion_z"),
+                GlobalConfig::get_float("quaternion_w"));
+    qDebug()<<"angle :";
+    qDebug()<<_quaternion.x();
+    qDebug()<<_quaternion.y();
+    qDebug()<<_quaternion.z();
+    qDebug()<<_quaternion.scalar();
     _zoom_level=GlobalConfig::get_int("zoom");
 }
 
-//UIState * UIState::instance(){
-//    static UIState _instance;
-//    return & _instance;
-//}
+void UIState::saveState(){
+    _quaternion.normalize();
+    GlobalConfig::set_float("quaternion_x",_quaternion.x());
+    GlobalConfig::set_float("quaternion_y",_quaternion.y());
+    GlobalConfig::set_float("quaternion_z",_quaternion.z());
+    GlobalConfig::set_float("quaternion_w",_quaternion.scalar());
+    GlobalConfig::set_int("zoom",_zoom_level);
+}
 
 UIState::~UIState(){
 }
@@ -36,17 +47,27 @@ void UIState::changeZoom(int delta){
 void UIState::rotate(QPoint mouse_coordinates){
     float xangle = 0.0;
     float yangle = 0.0;
-    xangle = mouse_coordinates.x();
-    QMatrix4x4 rotation;
-    qDebug()<<xangle;
-    if( xangle < 0) rotation.rotate(-xangle,0,-1,0);
-    else rotation.rotate(xangle,0,1,0);
-
-    yangle = (float)mouse_coordinates.y()/2;
-    if( yangle < 0) rotation.rotate(-yangle,-1,0,0);
-    else rotation.rotate(yangle,1,0,0);
-
-    _rotation = _rotation* rotation.transposed() ;
+    float xangle2 = 0.0;
+    float yangle2 = 0.0;
+    xangle2 = - mouse_coordinates.x();
+    yangle2 = mouse_coordinates.y();
+    xangle = (float)(mouse_coordinates.x());
+    yangle = (float)(mouse_coordinates.y());
+    _mouse_pos = mouse_coordinates;
+    float angle = 0.0;
+//    angle = - qSin(yangle2);
+    QVector3D vector(xangle2,yangle2,1);
+    qDebug()<<"vector"<<vector.x()<<" "
+              <<vector.y()<<" "
+                <<vector.z()<<" ";
+    vector = QVector3D::crossProduct(vector,QVector3D(0,0,1));
+    QQuaternion quaternion = QQuaternion::fromAxisAndAngle(vector,5);
+//    QQuaternion quaternion(deg2rad(yangle),QVector3D(1,0,0));
+//    quaternion.normalize();
+//    quaternion = QQuaternion::fromAxisAndAngle(1,0,0,yangle);
+//     QQuaternion quaternion2 = QQuaternion::fromAxisAndAngle(0,1,0,xangle);
+//    _quaternion = quaternion * quaternion2 * _quaternion ;
+    _quaternion = quaternion *_quaternion ;
 }
 
 void UIState::updateState(){
@@ -60,59 +81,27 @@ void UIState::actionProcess(){
             switch (i){
             case left:
                 _position+=Point3df(-1,0,0);
-//                _rotate.y(_rotate.y()+2);
-//                if(_rotate.y() >= 360 )_rotate.y(_rotate.y()-360);
-//                rotation.rotate(1,0,1,0);
-//                _quaternion = _quaternion * QQuaternion(1,0,1,0);
                 break;
             case right:
                 _position+=Point3df(1,0,0);
-//                _rotate.y(_rotate.y()-2);
-//                if(_rotate.y() < 0)_rotate.y(_rotate.y()+360);
-//                rotation.rotate(-1,0,1,0);
                 break;
             case up:
                 _position+=Point3df(0,-1,0);
-//                _rotate.x(_rotate.x()+2);
-//                if(_rotate.x() >= 360 )_rotate.x(_rotate.x()-360);
-//                rotation.rotate(1,1,0,0);
                 break;
             case down:
                 _position+=Point3df(0,1,0);
-//                _rotate.x(_rotate.x()-2);
-//                if(_rotate.x() < 0)_rotate.x(_rotate.x()+360);
-//                rotation.rotate(-1,1,0,0);
                 break;
             case forward:
                 _position+=Point3df(0,0,-1);
-//                _rotate.z(_rotate.z()+2);
-//                if(_rotate.z() >= 360 )_rotate.z(_rotate.z()-360);
-//                rotation.rotate(1,0,0,1);
                 break;
             case backward:
                 _position+=Point3df(0,0,1);
-//                _rotate.z(_rotate.z()-2);
-//                if(_rotate.z() < 0)_rotate.z(_rotate.z()+360);
-//                rotation.rotate(-1,0,0,1);
                 break;
             }
         }
     }
-    qDebug()<<"position "<<_position.x()<<" "<<_position.y()<<" "<<_position.z()<<" ";
-    _rotation =  _rotation * rotation;
-
-//    _rotation=QMatrix4x4();
-//    _rotation.rotate(_rotate.x(),1,0,0);
-//    _rotation.rotate(_rotate.y(),0,1,0);
-//    _rotation.rotate(_rotate.z(),0,0,1);
 }
 
-void UIState::saveState(){
-    GlobalConfig::set_int("rotate_x",_rotate.x());
-    GlobalConfig::set_int("rotate_y",_rotate.y());
-    GlobalConfig::set_int("rotate_z",_rotate.z());
-    GlobalConfig::set_int("zoom",_zoom_level);
-}
 
 bool UIState::action_going (int action){
     return _actions[action];

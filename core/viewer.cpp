@@ -65,7 +65,9 @@ void Viewer::draw()
 //    V.rotate(_ui->get_rotate().x(),1,0,0);
 //    V.rotate(_ui->get_rotate().y(),0,1,0);
 //    V.rotate(_ui->get_rotate().z(),0,0,1);
-    V = V*_ui->_rotation;
+//    V = V*_ui->_rotation;
+//    V = V*_ui->_quaternion;
+    V.rotate(_ui->_quaternion);
 
     _ui->set_view(V);
     _program->setUniformValue("V",V);
@@ -95,9 +97,9 @@ void Viewer::resizeGL(int width, int height){
 void Viewer::startShaders(){
         _program = new QGLShaderProgram(this);
 
-        _shaders[0] = compileShader("shaders/vshader.glsl",QGLShader::Vertex);
-        _shaders[1] = compileShader("shaders/fshader.glsl",QGLShader::Fragment);
-//      _shaders[2] = compileShader("shaders/gshader.glsl",QGLShader::Geometry);
+        _shaders[0] = compileShader(":/shaders/vshader.glsl",QGLShader::Vertex);
+        _shaders[1] = compileShader(":/shaders/fshader.glsl",QGLShader::Fragment);
+//      _shaders[2] = compileShader(":/shaders/gshader.glsl",QGLShader::Geometry);
         _shaders[2] = NULL;
 
         _program->addShader(_shaders[0]);
@@ -110,7 +112,7 @@ void Viewer::startShaders(){
 
 QGLShader * Viewer::compileShader(const char * path, QGLShader::ShaderType type){
     QGLShader * shader;
-    QFile shaderf(":/"+QString(path));
+    QFile shaderf(path);
     if (shaderf.open(QIODevice::ReadOnly)){
         QByteArray qvs = shaderf.readAll();
         shaderf.close();

@@ -25,7 +25,7 @@ void GlobalConfig::saveConfiguration(){
     QHashIterator<QString, QVariant> l(_values);
     while (l.hasNext()) {
         l.next();
-        _settings->setValue(l.key(),l.value());
+        _settings->setValue(l.key(),l.value().toString());
     }
 }
 
