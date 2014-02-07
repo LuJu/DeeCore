@@ -31,6 +31,15 @@ Viewer::Viewer() :
     _initiated(false){
     __build();
 }
+Viewer::Viewer(QWidget * parent) :
+    QGLWidget(parent),
+    _ui(NULL),
+    _input(NULL),
+    _timer_fps(NULL),
+    _timer_start(NULL),
+    _initiated(false){
+    __build();
+}
 
 Viewer::~Viewer(){
     deleteData();

@@ -30,6 +30,7 @@ class Viewer : public QGLWidget
 public:
     Viewer(const QGLFormat &format);
     Viewer(QGLContext * context);
+    Viewer(QWidget * parent);
     Viewer();
 //    Viewer(QWidget * parent = 0, const QGLWidget * shareWidget = 0, Qt::WindowFlags f = 0 ) : QGLWidget ( parent, shareWidget,f ){__build();}
     ~Viewer();
