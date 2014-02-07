@@ -23,10 +23,14 @@ void GlobalConfig::switchState(QString data){
 
 void GlobalConfig::saveConfiguration(){
     QHashIterator<QString, QVariant> l(_values);
+    _lock.lockForRead();
     while (l.hasNext()) {
         l.next();
         _settings->setValue(l.key(),l.value().toString());
     }
+    int zoom = _values["zoom"].toInt();
+    _lock.unlock();
+    ;;
 }
 
 bool GlobalConfig::loadConfiguration(const QString & organization, const QString & application){

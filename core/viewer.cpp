@@ -42,6 +42,10 @@ Viewer::Viewer(QWidget * parent) :
 }
 
 Viewer::~Viewer(){
+    if (_main_viewer) {
+        _ui->saveState();
+        GlobalConfig::saveConfiguration();
+    }
     deleteData();
 }
 
@@ -65,18 +69,19 @@ void Viewer::draw()
     QMatrix4x4 V;
     _program->setUniformValue("_color",QVector3D(1,1,1));
     float scale = (((float)_ui->get_zoom())/100)+0.5;
+    qDebug()<<_ui->get_zoom();
 //    V.translate( 0,-5.5,1);
     V.translate(_ui->get_position().x(),
                 _ui->get_position().y(),
                 _ui->get_position().z());
 
     V.scale(scale,scale,scale);
+    V.rotate(_ui->_quaternion);
 //    V.rotate(_ui->get_rotate().x(),1,0,0);
 //    V.rotate(_ui->get_rotate().y(),0,1,0);
 //    V.rotate(_ui->get_rotate().z(),0,0,1);
 //    V = V*_ui->_rotation;
 //    V = V*_ui->_quaternion;
-    V.rotate(_ui->_quaternion);
 
     _ui->set_view(V);
     _program->setUniformValue("V",V);
@@ -312,7 +317,7 @@ void Viewer::keyReleaseEvent(QKeyEvent *keyEvent)
 }
 
 void Viewer::closeEvent(QCloseEvent * event){
-    _ui->saveState();
-    GlobalConfig::saveConfiguration();
+
+
 //    QGLViewer::closeEvent(event);
 }

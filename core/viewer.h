@@ -35,6 +35,7 @@ public:
 //    Viewer(QWidget * parent = 0, const QGLWidget * shareWidget = 0, Qt::WindowFlags f = 0 ) : QGLWidget ( parent, shareWidget,f ){__build();}
     ~Viewer();
     void deleteData();
+    bool _main_viewer;
 
 public slots :
 void framepersecond();

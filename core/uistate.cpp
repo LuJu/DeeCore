@@ -17,11 +17,6 @@ void UIState::loadPreviousState(){
                 GlobalConfig::get_float("quaternion_y"),
                 GlobalConfig::get_float("quaternion_z"),
                 GlobalConfig::get_float("quaternion_w"));
-    qDebug()<<"angle :";
-    qDebug()<<_quaternion.x();
-    qDebug()<<_quaternion.y();
-    qDebug()<<_quaternion.z();
-    qDebug()<<_quaternion.scalar();
     _zoom_level=GlobalConfig::get_int("zoom");
 }
 
@@ -75,27 +70,26 @@ void UIState::updateState(){
 }
 
 void UIState::actionProcess(){
-    QMatrix4x4 rotation;
     for (int i=0;i<NUMBER_OF_ACTIONS;i++){
         if(_actions[i]==true){
             switch (i){
             case left:
-                _position+=Point3df(-1,0,0);
+                _position+=Point3df(-3,0,0);
                 break;
             case right:
-                _position+=Point3df(1,0,0);
+                _position+=Point3df(3,0,0);
                 break;
             case up:
-                _position+=Point3df(0,-1,0);
+                _position+=Point3df(0,3,0);
                 break;
             case down:
-                _position+=Point3df(0,1,0);
+                _position+=Point3df(0,-3,0);
                 break;
             case forward:
-                _position+=Point3df(0,0,-1);
+                _position+=Point3df(0,0,-3);
                 break;
             case backward:
-                _position+=Point3df(0,0,1);
+                _position+=Point3df(0,0,3);
                 break;
             }
         }
