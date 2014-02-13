@@ -30,8 +30,7 @@ class Viewer : public QGLWidget
 public:
     Viewer(const QGLFormat &format);
     Viewer(QGLContext * context);
-    Viewer(QWidget * parent);
-    Viewer();
+    Viewer(QWidget * parent = 0, const QGLWidget * shareWidget = 0, Qt::WindowFlags f = 0);
 //    Viewer(QWidget * parent = 0, const QGLWidget * shareWidget = 0, Qt::WindowFlags f = 0 ) : QGLWidget ( parent, shareWidget,f ){__build();}
     ~Viewer();
     void deleteData();
@@ -66,13 +65,18 @@ protected :
     virtual void resizeGL(int width, int height);
 
 
+
+
     //!Function called at the end of each frame
     void frameEnd();
 
     void paintGL(){draw();}
 
 
+    void insertMatrices(const QMatrix4x4& P,const QMatrix4x4& V,const QMatrix4x4& M);
+
     QGLShaderProgram * _program;
+    QGLShader * _shaders[3];
     QVector<GLuint> _textures;
 
     //! List of 3D objects on the scene. Only the objects on this array will be rendered
@@ -92,18 +96,16 @@ protected :
     bool _background_activated;
 
 private :
+    void __build(){/*init();*/}
     GLint _viewport[4];
     QGLShader * compileShader(const char * path, QGLShader::ShaderType type);
     void initializeGL(){init();}
-    void __build(){/*init();*/}
 
     QPoint _last_position;
     void updateLastMousePosition(const QPoint& position){
         _last_position = position;
     }
 
-    QGLShader * _shaders[3];
-//        QGLShader *
 
     bool _initiated;
 

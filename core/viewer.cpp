@@ -22,17 +22,8 @@ Viewer::Viewer(QGLContext * context) :
     _initiated(false){
     __build();
 }
-Viewer::Viewer() :
-    QGLWidget(),
-    _ui(NULL),
-    _input(NULL),
-    _timer_fps(NULL),
-    _timer_start(NULL),
-    _initiated(false){
-    __build();
-}
-Viewer::Viewer(QWidget * parent) :
-    QGLWidget(parent),
+Viewer::Viewer(QWidget * parent, const QGLWidget * shareWidget, Qt::WindowFlags f) :
+    QGLWidget(parent,shareWidget,f),
     _ui(NULL),
     _input(NULL),
     _timer_fps(NULL),
@@ -69,29 +60,31 @@ void Viewer::draw()
     QMatrix4x4 V;
     _program->setUniformValue("_color",QVector3D(1,1,1));
     float scale = (((float)_ui->get_zoom())/100)+0.5;
-    qDebug()<<_ui->get_zoom();
-//    V.translate( 0,-5.5,1);
-    V.translate(_ui->get_position().x(),
-                _ui->get_position().y(),
-                _ui->get_position().z());
 
+    Camera& camera = _ui->get_camera();
+    V.translate(camera.get_position().x(),
+                camera.get_position().y(),
+                camera.get_position().z());
     V.scale(scale,scale,scale);
     V.rotate(_ui->_quaternion);
-//    V.rotate(_ui->get_rotate().x(),1,0,0);
-//    V.rotate(_ui->get_rotate().y(),0,1,0);
-//    V.rotate(_ui->get_rotate().z(),0,0,1);
-//    V = V*_ui->_rotation;
-//    V = V*_ui->_quaternion;
+    V.rotate(camera.get_rotation());
+    _ui->get_camera().set_view_matrix(V);
 
-    _ui->set_view(V);
     _program->setUniformValue("V",V);
+
+    QMatrix4x4 P;
+    P.ortho(-1000,1000,-1000,1000,-1000,1000);
+//    P.perspective(_ui->fov,4.0f/3.0f,0.1f,100.0f);
+    _ui->get_camera().set_projection_matrix(P);
+    _program->setUniformValue("P",P);
+
 }
 
 void Viewer::resizeGL(int width, int height){
     QMatrix4x4 P;
-    P.ortho(-1000,1000,-1000,1000,-1000,1000);
-//    P.perspective(45.0f,2.0f/3.0f,0.1f,100.0f);
-    _ui->set_projection(P);
+//    P.ortho(-1000,1000,-1000,1000,-1000,1000);
+    P.perspective(_ui->fov,4.0f/3.0f,0.0001f,10000000.0f);
+    _ui->get_camera().set_projection_matrix(P);
     _program->setUniformValue("P",P);
     int side = qMin(width, height);
     glViewport(0,0, width, height);
@@ -143,16 +136,20 @@ QGLShader * Viewer::compileShader(const char * path, QGLShader::ShaderType type)
 void Viewer::display3DObjects(){
     for(int i = 0; i< _3D_display_list.size(); i++){
         QMatrix4x4 M,V,P;
-        V = _ui->get_view();
-        P = _ui->get_projection();
+        V = _ui->get_camera().get_view_matrix();
+        P = _ui->get_camera().get_projection_matrix();
         M = _3D_display_list[i]->get_matrix();
-        _program->setUniformValue("M",_3D_display_list[i]->get_matrix());
-        QMatrix4x4 pvm = P*V*M;
-        _program->setUniformValue("pvm",pvm);
+        insertMatrices(P,V,M);
         _3D_display_list[i]->render();
     }
 }
 
+void Viewer::insertMatrices(const QMatrix4x4& P,const QMatrix4x4& V,const QMatrix4x4& M){
+    _program->setUniformValue("M",M);
+    _program->setUniformValue("V",V);
+    _program->setUniformValue("P",P);
+    _program->setUniformValue("pvm",P*V*M);
+}
 
 void Viewer::displayFullTextured(int x, int y, int width, int height){
     glBegin(GL_QUADS); {
@@ -166,20 +163,42 @@ void Viewer::displayFullTextured(int x, int y, int width, int height){
 //        glVertex2d(startposition+_background_position,            0          );
     } glEnd();
 }
+
 void Viewer::display2D(){
-    glDisable(GL_LIGHTING);
+//    glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
 //    startScreenCoordinatesSystem();
 //    camera()->getViewport(_viewport);
-    float width = _viewport[2];
-    float height= _viewport[1];
-    if(_background_activated) {
-        glPushMatrix();{
+    glGetIntegerv( GL_VIEWPORT, _viewport );
 
-            GLint tex_size[2];
-            glBindTexture(GL_TEXTURE_2D, _textures[4]);
-            glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_WIDTH,&tex_size[0]);
-            glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_HEIGHT,&tex_size[1]);
+    float height= _viewport[1];
+    float width = _viewport[2];
+
+//    glViewport(0,0,10,10);
+    QMatrix4x4 proj;
+//    glViewport(0,0,width,height);
+    proj.ortho(0,width,0,height,0,0);
+//    _program->setUniformValue("P",proj);
+    QMatrix4x4 pvm = proj;
+//    _program->setUniformValue("pvm",pvm);
+    _program->release();
+    if(_background_activated || true) {
+        GLint tex_size[0];
+        glBindTexture(GL_TEXTURE_2D, _textures[0]);
+        glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_WIDTH,&tex_size[0]);
+        glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_HEIGHT,&tex_size[1]);
+        glBegin(GL_QUADS);{
+            glTexCoord2d(0,0);
+            glVertex2d(0,0);
+            glVertex2d(width,0);
+            glTexCoord2d(1,0);
+            glVertex2d(width,height);
+            glTexCoord2d(1,1);
+            glVertex2d(0,height);
+            glTexCoord2d(1,0);
+        } glEnd();
+
+
 //            Mesh3d me
 //            glBegin(GL_QUADS); {
 //                int startposition = 0;
@@ -201,11 +220,11 @@ void Viewer::display2D(){
             if(_background_position>tex_size[0]){
               _background_position=0;
             }
-        } glPopMatrix();
     }
 //    stopScreenCoordinatesSystem();
+    _program->bind();
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_LIGHTING);
+//    glEnable(GL_LIGHTING);
 }
 
 void Viewer::init()
@@ -214,12 +233,7 @@ void Viewer::init()
     _input = new InputManager();
     _ui = new UIState();
     _input->set_ui(_ui);
-//    _input = InputManager::instance();
-//    _ui = UIState::instance();
 
-    int major,minor;
-    glGetIntegerv(GL_MAJOR_VERSION,&major);
-    glGetIntegerv(GL_MINOR_VERSION,&minor);
     glClearColor(0.2,0.2,0.2,1);
     startShaders();
     _timer_fps= new QTimer();
@@ -236,7 +250,8 @@ void Viewer::init()
     _time.start();
     QMatrix4x4 P;
     P.ortho(-1,1,-1,1,-1,1);
-    _ui->set_projection(P);
+    P.perspective(90,4/3,.1,1);
+    _ui->get_camera().set_projection_matrix(P);
     _program->setUniformValue("P",P);
     _initiated = true;
 }
@@ -264,14 +279,17 @@ void Viewer::loadTexture(const QString &textureName)
 {
     QImage qim_Texture;
     QImage qim_TempTexture;
-    qim_TempTexture.load(textureName);
-    qim_Texture = QGLWidget::convertToGLFormat( qim_TempTexture );
-    _textures.append(0);
-    glGenTextures( 1, &_textures[_textures.size()-1] );
-    glBindTexture( GL_TEXTURE_2D, _textures[_textures.size()-1] );
-    glTexImage2D( GL_TEXTURE_2D, 0, 3, qim_Texture.width(), qim_Texture.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, qim_Texture.bits() );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    if(qim_TempTexture.load(textureName)){
+        qim_Texture = QGLWidget::convertToGLFormat( qim_TempTexture );
+        _textures.append(0);
+        glGenTextures( 1, &_textures[_textures.size()-1] );
+        glBindTexture( GL_TEXTURE_2D, _textures[_textures.size()-1] );
+        glTexImage2D( GL_TEXTURE_2D, 0, 3, qim_Texture.width(), qim_Texture.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, qim_Texture.bits() );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    } else {
+        qCritical()<<"failed to load textue :"<<textureName;
+    }
 }
 
 void Viewer::loadTextures(QStringList &list){

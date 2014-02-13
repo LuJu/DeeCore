@@ -20,6 +20,7 @@ public:
     Point3df _position;
     Point3df _lookat;
     Vector3df _up_vector;
+    QQuaternion _rotation;
 
 
 
@@ -32,6 +33,7 @@ public:
 
     QMatrix4x4 _projection;
     QMatrix4x4 _view;
+
 
     const QMatrix4x4& get_view_matrix(){return _view;}
     const QMatrix4x4& get_projection_matrix(){return _projection;}
@@ -48,6 +50,21 @@ public:
 //    void computeView(){
 //        _view.
 //    }
+
+    void set_rotation(const QQuaternion & rotation){
+        _rotation = rotation;
+    }
+
+    const QQuaternion& get_rotation() const {
+        return _rotation;
+    }
+
+    const Point3df& get_position() const {return _position;}
+    void set_position(const Point3df& position){_position = position;}
+
+    void move(Point3df distance){
+        _position += distance;
+    }
 
 };
 

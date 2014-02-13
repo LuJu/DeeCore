@@ -74,7 +74,7 @@ private:
     InputManager(const InputManager&);
 
 
-    static const quint8 NUMBER_OF_KEYS=9;
+    static const quint8 NUMBER_OF_KEYS=40;
     static const int _default_keyboard_matching[NUMBER_OF_KEYS];
     bool _keyboard_activated;
     bool _mouse_activated;

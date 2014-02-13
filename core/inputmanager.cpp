@@ -10,11 +10,21 @@ const int InputManager::_default_keyboard_matching[NUMBER_OF_KEYS]={
     Qt::Key_Right,
     Qt::Key_Up,
     Qt::Key_Down,
+
     Qt::Key_PageUp,
     Qt::Key_PageDown,
+
     Qt::Key_0,
     Qt::Key_1,
-    Qt::Key_2};
+    Qt::Key_2,
+
+    Qt::Key_E,
+
+    Qt::Key_Eacute,
+    Qt::Key_U,
+    Qt::Key_A,
+    Qt::Key_I
+};
 
 InputManager::InputManager()
 {
@@ -42,6 +52,11 @@ void InputManager::keyboardEvent(int key, int eventType)
         case Qt::Key_0:
         case Qt::Key_1:
         case Qt::Key_2:
+        case Qt::Key_A:
+        case Qt::Key_E:
+        case Qt::Key_U:
+        case Qt::Key_I:
+        case Qt::Key_Eacute:
             action = get_key_action(key);
             if(action!=-1){ //Means that the action is recorded and has an effect
                 if(eventType==Key_Pressed){
