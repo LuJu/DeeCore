@@ -38,6 +38,7 @@ public:
         The zoom value goes from 0 to 1000
     */
     inline int get_zoom(){return _zoom_level;}
+    inline void set_zoom(int zoom){_zoom_level=zoom;}
 
     inline QPoint get_mouse_position(){return _mouse_pos;}
     inline void set_mouse_position(QPoint mouse_pos){ _mouse_pos=mouse_pos;}
@@ -74,6 +75,7 @@ public:
     void activateProgressiveZoom(float speed){
         _progressive_zoom._activated = true;
         _progressive_zoom._speed= speed;
+        _progressive_zoom._targeted = _zoom_level;
         if (speed == 0) qDebug()<<"Invalid speed value";
     }
 

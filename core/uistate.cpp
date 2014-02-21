@@ -50,7 +50,8 @@ void UIState::changeZoom(int delta){
 }
 
 void UIState::displayCameraInformation(){
-    qDebug()<<"Position :"<<_camera.get_position().x()<<" "<<_camera.get_position().y()<<" "<<_camera.get_position().z();
+//    qDebug()<<"Position :"<<_camera.get_position().x()<<" "<<_camera.get_position().y()<<" "<<_camera.get_position().z();
+    qDebug()<<"zoom :"<<_zoom_level;
 }
 
 
