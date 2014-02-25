@@ -36,9 +36,12 @@ public:
     void deleteData();
     bool _main_viewer;
 
+    QVector<GLuint> textures() const;
+    void setTextures(const QVector<GLuint> &textures);
+
 public slots :
-void framepersecond();
-void animate();
+    void framepersecond();
+    void animate();
 
 
 protected :
@@ -77,7 +80,6 @@ protected :
 
     QGLShaderProgram * _program;
     QGLShader * _shaders[3];
-    QVector<GLuint> _textures;
 
     //! List of 3D objects on the scene. Only the objects on this array will be rendered
     QVector<GraphicObject3D * > _3D_display_list;

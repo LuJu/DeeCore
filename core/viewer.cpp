@@ -182,21 +182,21 @@ void Viewer::display2D(){
     QMatrix4x4 pvm = proj;
 //    _program->setUniformValue("pvm",pvm);
     _program->release();
-    if(_background_activated || true) {
-        GLint tex_size[0];
-        glBindTexture(GL_TEXTURE_2D, _textures[0]);
-        glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_WIDTH,&tex_size[0]);
-        glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_HEIGHT,&tex_size[1]);
-        glBegin(GL_QUADS);{
-            glTexCoord2d(0,0);
-            glVertex2d(0,0);
-            glVertex2d(width,0);
-            glTexCoord2d(1,0);
-            glVertex2d(width,height);
-            glTexCoord2d(1,1);
-            glVertex2d(0,height);
-            glTexCoord2d(1,0);
-        } glEnd();
+//    if(_background_activated) {
+//        GLint tex_size[0];
+//        glBindTexture(GL_TEXTURE_2D, _textures[0]);
+//        glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_WIDTH,&tex_size[0]);
+//        glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_HEIGHT,&tex_size[1]);
+//        glBegin(GL_QUADS);{
+//            glTexCoord2d(0,0);
+//            glVertex2d(0,0);
+//            glVertex2d(width,0);
+//            glTexCoord2d(1,0);
+//            glVertex2d(width,height);
+//            glTexCoord2d(1,1);
+//            glVertex2d(0,height);
+//            glTexCoord2d(1,0);
+//        } glEnd();
 
 
 //            Mesh3d me
@@ -217,10 +217,10 @@ void Viewer::display2D(){
 //                } while(startposition<width);
 //            } glEnd();
 //            _background_position+=1;
-            if(_background_position>tex_size[0]){
-              _background_position=0;
-            }
-    }
+//            if(_background_position>tex_size[0]){
+//              _background_position=0;
+//            }
+//    }
 //    stopScreenCoordinatesSystem();
     _program->bind();
     glEnable(GL_DEPTH_TEST);
@@ -280,13 +280,13 @@ void Viewer::loadTexture(const QString &textureName)
     QImage qim_Texture;
     QImage qim_TempTexture;
     if(qim_TempTexture.load(textureName)){
-        qim_Texture = QGLWidget::convertToGLFormat( qim_TempTexture );
-        _textures.append(0);
-        glGenTextures( 1, &_textures[_textures.size()-1] );
-        glBindTexture( GL_TEXTURE_2D, _textures[_textures.size()-1] );
-        glTexImage2D( GL_TEXTURE_2D, 0, 3, qim_Texture.width(), qim_Texture.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, qim_Texture.bits() );
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+//        qim_Texture = QGLWidget::convertToGLFormat( qim_TempTexture );
+//        _textures.append(0);
+//        glGenTextures( 1, &_textures[_textures.size()-1] );
+//        glBindTexture( GL_TEXTURE_2D, _textures[_textures.size()-1] );
+//        glTexImage2D( GL_TEXTURE_2D, 0, 3, qim_Texture.width(), qim_Texture.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, qim_Texture.bits() );
+//        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+//        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     } else {
         qCritical()<<"failed to load textue :"<<textureName;
     }
@@ -339,3 +339,4 @@ void Viewer::closeEvent(QCloseEvent * event){
 
 //    QGLViewer::closeEvent(event);
 }
+
