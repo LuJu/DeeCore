@@ -234,6 +234,13 @@ void Viewer::init()
     _ui = new UIState();
     _input->set_ui(_ui);
 
+    qDebug() << "OpenGL Versions Supported: " << QGLFormat::openGLVersionFlags();
+
+    QString versionString(QLatin1String(reinterpret_cast<const char*>(glGetString(GL_VERSION))));
+    qDebug() << "Driver Version String:" << versionString;
+    qDebug() << "Current Context:" << format();
+
+
     glClearColor(0.2,0.2,0.2,1);
     startShaders();
     _timer_fps= new QTimer();
