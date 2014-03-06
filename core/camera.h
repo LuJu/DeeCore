@@ -66,6 +66,19 @@ public:
         _position += distance;
     }
 
+    void debug()const{
+        qDebug()<<"["<<_view(0,0)<<" "<<_view(0,1)<<" "<<_view(0,2)<<" "<<_view(0,3);
+        qDebug()<<"["<<_view(1,0)<<" "<<_view(1,1)<<" "<<_view(1,2)<<" "<<_view(1,3);
+        qDebug()<<"["<<_view(2,0)<<" "<<_view(2,1)<<" "<<_view(2,2)<<" "<<_view(2,3);
+        qDebug()<<"["<<_view(3,0)<<" "<<_view(3,1)<<" "<<_view(3,2)<<" "<<_view(3,3);
+    }
+    void debug(QMatrix4x4 _view)const{
+        qDebug()<<"["<<_view(0,0)<<" "<<_view(0,1)<<" "<<_view(0,2)<<" "<<_view(0,3);
+        qDebug()<<"["<<_view(1,0)<<" "<<_view(1,1)<<" "<<_view(1,2)<<" "<<_view(1,3);
+        qDebug()<<"["<<_view(2,0)<<" "<<_view(2,1)<<" "<<_view(2,2)<<" "<<_view(2,3);
+        qDebug()<<"["<<_view(3,0)<<" "<<_view(3,1)<<" "<<_view(3,2)<<" "<<_view(3,3);
+    }
+
 };
 
 #endif // CAMERA_H

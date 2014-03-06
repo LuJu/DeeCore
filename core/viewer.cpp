@@ -77,6 +77,10 @@ void Viewer::draw()
 //    P.perspective(_ui->fov,4.0f/3.0f,0.1f,100.0f);
     _ui->get_camera().set_projection_matrix(P);
     _program->setUniformValue("P",P);
+    qDebug()<<"position : "<<camera.get_position().x()<<" "<<camera.get_position().y()<<" "<<camera.get_position().z();
+    _ui->get_camera().debug(V);
+//    _program->setUniformValue("view_direction",QVector3D(_ui->get_camera().get_view_matrix().column(3)));
+
 
 }
 
