@@ -58,7 +58,7 @@ void UIState::displayCameraInformation(){
 void UIState::rotate(QPoint mouse_coordinates){
     float xangle,yangle;
     xangle = - mouse_coordinates.x();
-    yangle = mouse_coordinates.y();
+    yangle =   mouse_coordinates.y();
 //    _mouse_pos = mouse_coordinates;
     QVector3D vector = QVector3D::crossProduct(QVector3D(xangle,yangle,0),QVector3D(0,0,1));
 

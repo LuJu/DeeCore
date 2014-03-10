@@ -77,8 +77,8 @@ void Viewer::draw()
 //    P.perspective(_ui->fov,4.0f/3.0f,0.1f,100.0f);
     _ui->get_camera().set_projection_matrix(P);
     _program->setUniformValue("P",P);
-    qDebug()<<"position : "<<camera.get_position().x()<<" "<<camera.get_position().y()<<" "<<camera.get_position().z();
-    _ui->get_camera().debug(V);
+//    qDebug()<<"position : "<<camera.get_position().x()<<" "<<camera.get_position().y()<<" "<<camera.get_position().z();
+//    _ui->get_camera().debug(V);
 //    _program->setUniformValue("view_direction",QVector3D(_ui->get_camera().get_view_matrix().column(3)));
 
 
@@ -118,6 +118,9 @@ void Viewer::startShaders(){
 //        _program->addShader(_shaders[2]);
 
         if(_program->link()) qDebug()<<"Link success";
+        else {
+            qCritical()<<"Fail to link shader program";
+        }
         if(_program->bind()) qDebug()<<"Bind success";
 }
 
@@ -283,31 +286,6 @@ void Viewer::framepersecond()
     if(GlobalConfig::is_enabled("output_fps"))
         qDebug()<<"FPS : "<<_frame;
      _frame=0;
-}
-
-
-void Viewer::loadTexture(const QString &textureName)
-{
-    QImage qim_Texture;
-    QImage qim_TempTexture;
-    if(qim_TempTexture.load(textureName)){
-//        qim_Texture = QGLWidget::convertToGLFormat( qim_TempTexture );
-//        _textures.append(0);
-//        glGenTextures( 1, &_textures[_textures.size()-1] );
-//        glBindTexture( GL_TEXTURE_2D, _textures[_textures.size()-1] );
-//        glTexImage2D( GL_TEXTURE_2D, 0, 3, qim_Texture.width(), qim_Texture.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, qim_Texture.bits() );
-//        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-//        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    } else {
-        qCritical()<<"failed to load textue :"<<textureName;
-    }
-}
-
-void Viewer::loadTextures(QStringList &list){
-    for (int i = 0; i < list.size(); ++i) {
-        QString asset=list.at(i);
-        loadTexture(asset);
-    }
 }
 
 void Viewer::addTo3DDisplayList(GraphicObject3D * object){

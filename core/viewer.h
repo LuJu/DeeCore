@@ -61,8 +61,6 @@ protected :
     void display2D();
     void displayFullTextured(int x, int y, int width, int height);
 
-    void loadTexture(const QString &textureName);
-    void loadTextures(QStringList &list);
     void startShaders();
     virtual void resizeGL(int width, int height);
 
