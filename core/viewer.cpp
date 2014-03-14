@@ -255,7 +255,7 @@ void Viewer::init()
     _timer_fps->connect(_timer_fps, SIGNAL(timeout()),this, SLOT(framepersecond()));
     _timer_fps->start();
     _frame=0;
-    _background_activated=true;
+    _background_activated=false;
 
     _timer_start = new QTimer(this);
     connect(_timer_start, SIGNAL(timeout()), this, SLOT(animate()));
