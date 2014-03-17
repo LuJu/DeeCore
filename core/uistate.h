@@ -24,11 +24,12 @@ class UIState : public QObject
 public slots:
 public:
     enum Actions {
-        left, right, up, down,
+        left=0, right, up, down,
         forward,backward,
         action, back, option,
         e_,
         ru,rd,rl,rr,
+        NUMBER_OF_ACTIONS,
         none
     };
 
@@ -91,8 +92,6 @@ private:
     UIState(const UIState&);
     void actionProcess();
 
-    // Static constants
-    static const quint8 NUMBER_OF_ACTIONS=15;
 
 //    Point3df _position;
     Point3df _previous_position;

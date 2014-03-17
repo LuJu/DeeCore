@@ -33,10 +33,10 @@ Viewer::Viewer(QWidget * parent, const QGLWidget * shareWidget, Qt::WindowFlags 
 }
 
 Viewer::~Viewer(){
-    if (_main_viewer) {
+//    if (_main_viewer) {
 //        _ui->saveState();
 //        GlobalConfig::saveConfiguration();
-    }
+//    }
     deleteData();
 }
 
