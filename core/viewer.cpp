@@ -237,6 +237,7 @@ void Viewer::display2D(){
 void Viewer::init()
 {
     deleteData();
+    setCursor(Qt::OpenHandCursor);
     _input = new InputManager();
     _ui = new UIState();
     _input->set_ui(_ui);
@@ -295,7 +296,13 @@ void Viewer::addTo3DDisplayList(GraphicObject3D * object){
 void Viewer::mousePressEvent(QMouseEvent * event)
 {
     QPoint position = event->pos();
+    setCursor(Qt::ClosedHandCursor);
     updateLastMousePosition(event->pos());
+}
+
+void Viewer::mouseReleaseEvent(QMouseEvent * event){
+    setCursor(Qt::OpenHandCursor);
+
 }
 
 void Viewer::mouseMoveEvent(QMouseEvent * event){

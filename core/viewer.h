@@ -48,6 +48,7 @@ protected :
     virtual void init();
 
     virtual void mousePressEvent(QMouseEvent * mouseEvent);
+    virtual void mouseReleaseEvent(QMouseEvent * event);
     virtual void wheelEvent(QWheelEvent * wheelEvent);
     virtual void mouseMoveEvent(QMouseEvent * event);
     virtual void keyPressEvent(QKeyEvent *keyEvent);

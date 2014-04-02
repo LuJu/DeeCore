@@ -103,7 +103,16 @@ void InputManager::mouseEvent( int eventType, QPoint pos, int key)
         }
         break;
     case Moved:
-        _ui->rotate(pos);
+        switch (_ui->_type) {
+        case UIState::camera2D:
+            _ui->get_camera().move(Point3df(-pos.x(),pos.y(),0));
+            break;
+        case UIState::camera3D:
+            _ui->rotate(pos);
+            break;
+        default:
+            break;
+        }
         break;
     default:
         break;

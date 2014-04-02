@@ -33,6 +33,13 @@ public:
         none
     };
 
+    enum Types {
+        camera2D,
+        camera3D
+    };
+
+    Types _type;
+
 
     //! Get the zoom value of the view
     /*!

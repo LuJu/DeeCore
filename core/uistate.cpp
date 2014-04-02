@@ -7,6 +7,7 @@ UIState::UIState():
     _action_done=false;
     for (int i=0;i<NUMBER_OF_ACTIONS;i++) _actions[i]=false;
     _paused=false;
+    _type = camera3D;
     loadPreviousState();
     _progressive_zoom._targeted=_zoom_level;
     _progressive_zoom._activated = false;
@@ -15,22 +16,25 @@ UIState::UIState():
     fov=90;
 }
 
+
+//not working
 void UIState::loadPreviousState(){
-    _quaternion = _quaternion.fromAxisAndAngle(
-                GlobalConfig::get_float("quaternion_x"),
-                GlobalConfig::get_float("quaternion_y"),
-                GlobalConfig::get_float("quaternion_z"),
-                GlobalConfig::get_float("quaternion_w"));
-    _zoom_level=GlobalConfig::get_int("zoom");
+//    _quaternion = _quaternion.fromAxisAndAngle(
+//                GlobalConfig::get_float("quaternion_x"),
+//                GlobalConfig::get_float("quaternion_y"),
+//                GlobalConfig::get_float("quaternion_z"),
+//                GlobalConfig::get_float("quaternion_w"));
+//    _zoom_level=GlobalConfig::get_int("zoom");
 }
 
+//not working
 void UIState::saveState(){
-    _quaternion.normalize();
-    GlobalConfig::set_float("quaternion_x",_quaternion.x());
-    GlobalConfig::set_float("quaternion_y",_quaternion.y());
-    GlobalConfig::set_float("quaternion_z",_quaternion.z());
-    GlobalConfig::set_float("quaternion_w",_quaternion.scalar());
-    GlobalConfig::set_int("zoom",_zoom_level);
+//    _quaternion.normalize();
+//    GlobalConfig::set_float("quaternion_x",_quaternion.x());
+//    GlobalConfig::set_float("quaternion_y",_quaternion.y());
+//    GlobalConfig::set_float("quaternion_z",_quaternion.z());
+//    GlobalConfig::set_float("quaternion_w",_quaternion.scalar());
+//    GlobalConfig::set_int("zoom",_zoom_level);
 }
 
 UIState::~UIState(){
@@ -38,11 +42,11 @@ UIState::~UIState(){
 
 void UIState::changeZoom(int delta){
     if (!_progressive_zoom._activated){
-        if(_zoom_level+delta > 20000)     _zoom_level = 20000 ;
+        if(_zoom_level+delta > 10000)     _zoom_level = 10000 ;
         else if (_zoom_level+delta < 0) _zoom_level = 0 ;
         else _zoom_level = _zoom_level+delta;
     } else {
-        if(_progressive_zoom._targeted+delta > 20000)     _progressive_zoom._targeted = 20000 ;
+        if(_progressive_zoom._targeted+delta > 10000)     _progressive_zoom._targeted = 10000 ;
         else if (_progressive_zoom._targeted+delta < 0) _progressive_zoom._targeted = 0 ;
         else _progressive_zoom._targeted = _progressive_zoom._targeted+delta;
     }
