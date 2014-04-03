@@ -19,22 +19,22 @@ UIState::UIState():
 
 //not working
 void UIState::loadPreviousState(){
-//    _quaternion = _quaternion.fromAxisAndAngle(
-//                GlobalConfig::get_float("quaternion_x"),
-//                GlobalConfig::get_float("quaternion_y"),
-//                GlobalConfig::get_float("quaternion_z"),
-//                GlobalConfig::get_float("quaternion_w"));
-//    _zoom_level=GlobalConfig::get_int("zoom");
+    _quaternion = _quaternion.fromAxisAndAngle(
+                GlobalConfig::get_float("quaternion_x"),
+                GlobalConfig::get_float("quaternion_y"),
+                GlobalConfig::get_float("quaternion_z"),
+                GlobalConfig::get_float("quaternion_w"));
+    _zoom_level=GlobalConfig::get_int("zoom");
 }
 
 //not working
 void UIState::saveState(){
-//    _quaternion.normalize();
-//    GlobalConfig::set_float("quaternion_x",_quaternion.x());
-//    GlobalConfig::set_float("quaternion_y",_quaternion.y());
-//    GlobalConfig::set_float("quaternion_z",_quaternion.z());
-//    GlobalConfig::set_float("quaternion_w",_quaternion.scalar());
-//    GlobalConfig::set_int("zoom",_zoom_level);
+    _quaternion.normalize();
+    GlobalConfig::set_float("quaternion_x",_quaternion.x());
+    GlobalConfig::set_float("quaternion_y",_quaternion.y());
+    GlobalConfig::set_float("quaternion_z",_quaternion.z());
+    GlobalConfig::set_float("quaternion_w",_quaternion.scalar());
+    GlobalConfig::set_int("zoom",_zoom_level);
 }
 
 UIState::~UIState(){
