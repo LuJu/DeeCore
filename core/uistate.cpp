@@ -12,7 +12,7 @@ UIState::UIState():
     _progressive_zoom._targeted=_zoom_level;
     _progressive_zoom._activated = false;
     _progressive_zoom._speed = 1;
-    _camera.set_position(Point3df(-9,-8.5,92));
+    _camera.set_position(Point3df(-9,-28.5,92));
     fov=90;
 }
 
@@ -42,11 +42,11 @@ UIState::~UIState(){
 
 void UIState::changeZoom(int delta){
     if (!_progressive_zoom._activated){
-        if(_zoom_level+delta > 10000)     _zoom_level = 10000 ;
+        if(_zoom_level+delta > 30000)     _zoom_level = 30000 ;
         else if (_zoom_level+delta < 0) _zoom_level = 0 ;
         else _zoom_level = _zoom_level+delta;
     } else {
-        if(_progressive_zoom._targeted+delta > 10000)     _progressive_zoom._targeted = 10000 ;
+        if(_progressive_zoom._targeted+delta > 30000)     _progressive_zoom._targeted = 30000 ;
         else if (_progressive_zoom._targeted+delta < 0) _progressive_zoom._targeted = 0 ;
         else _progressive_zoom._targeted = _progressive_zoom._targeted+delta;
     }

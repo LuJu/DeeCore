@@ -65,6 +65,9 @@ void Viewer::draw()
     V.translate(camera.get_position().x(),
                 camera.get_position().y(),
                 camera.get_position().z());
+    qDebug()<<"position"<<camera.get_position().x()<<" "<<
+              camera.get_position().y()<<" "<<
+              camera.get_position().z()<<" ";
     V.scale(scale,scale,scale);
     V.rotate(_ui->_quaternion);
     V.rotate(camera.get_rotation());
