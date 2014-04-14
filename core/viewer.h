@@ -94,6 +94,8 @@ protected :
     QTime _time;
     int _background_position;
     bool _background_activated;
+    void releaseProgram();
+    void bindProgram();
 
 private :
     void __build(){/*init();*/}
@@ -108,6 +110,8 @@ private :
 
 
     bool _initiated;
+    void debugData(const qreal* data);
+    void debugDataGL(const GLfloat *data);
 
 };
 #endif // VIEWER_H

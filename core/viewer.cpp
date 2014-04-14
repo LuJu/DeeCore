@@ -44,8 +44,10 @@ void Viewer::deleteData(){
     if (_initiated){
         if (_timer_fps) delete _timer_fps;
         if (_timer_start) delete _timer_start;
-        for (int i = 0; i < 3; ++i) {
-            if (_shaders[i]) delete _shaders[i];
+        if(GlobalConfig::is_enabled("shaders")){
+            for (int i = 0; i < 3; ++i) {
+                if (_shaders[i]) delete _shaders[i];
+            }
         }
         if (_ui) delete _ui;
         if (_input) delete _input;
@@ -58,7 +60,6 @@ void Viewer::draw()
     glEnable(GL_DEPTH_TEST);
 
     QMatrix4x4 V;
-    _program->setUniformValue("_color",QVector3D(1,1,1));
     float scale = (((float)_ui->get_zoom())/100)+0.5;
 
     Camera& camera = _ui->get_camera();
@@ -73,13 +74,13 @@ void Viewer::draw()
     V.rotate(camera.get_rotation());
     _ui->get_camera().set_view_matrix(V);
 
-    _program->setUniformValue("V",V);
+//    _program->setUniformValue("V",V);
 
     QMatrix4x4 P;
     P.ortho(-1000,1000,-1000,1000,-1000,1000);
 //    P.perspective(_ui->fov,4.0f/3.0f,0.1f,100.0f);
     _ui->get_camera().set_projection_matrix(P);
-    _program->setUniformValue("P",P);
+//    _program->setUniformValue("P",P);
 //    qDebug()<<"position : "<<camera.get_position().x()<<" "<<camera.get_position().y()<<" "<<camera.get_position().z();
 //    _ui->get_camera().debug(V);
 //    _program->setUniformValue("view_direction",QVector3D(_ui->get_camera().get_view_matrix().column(3)));
@@ -92,7 +93,7 @@ void Viewer::resizeGL(int width, int height){
 //    P.ortho(-1000,1000,-1000,1000,-1000,1000);
     P.perspective(_ui->fov,4.0f/3.0f,0.0001f,10000000.0f);
     _ui->get_camera().set_projection_matrix(P);
-    _program->setUniformValue("P",P);
+//    _program->setUniformValue("P",P);
     int side = qMin(width, height);
     glViewport(0,0, width, height);
 //    glViewport(0, 0, width, height);
@@ -154,11 +155,65 @@ void Viewer::display3DObjects(){
     }
 }
 
+void Viewer::bindProgram(){
+    if (GlobalConfig::is_enabled("shaders_activated"))
+        bindProgram();
+}
+
+void Viewer::releaseProgram(){
+    if (GlobalConfig::is_enabled("shaders_activated"))
+        releaseProgram();
+
+}
+
 void Viewer::insertMatrices(const QMatrix4x4& P,const QMatrix4x4& V,const QMatrix4x4& M){
+    if (GlobalConfig::is_enabled("shaders")){
     _program->setUniformValue("M",M);
     _program->setUniformValue("V",V);
     _program->setUniformValue("P",P);
     _program->setUniformValue("pvm",P*V*M);
+    } else {
+        GLfloat matrix[16];
+        const qreal* data = (P).transposed().data();
+        for (int i = 0; i < 16; ++i) {
+            matrix[i] = data[i];
+        }
+//        debugData(data);
+//        Debugger::promptOpenGLError();
+        debugDataGL(matrix);
+//        Debugger::promptOpenGLError();
+        glMatrixMode(GL_PROJECTION);
+//        Debugger::promptOpenGLError();
+        glLoadIdentity();
+        glMultMatrixf(matrix);
+        GLfloat m[16];
+//        debugDataGL(m);
+        glGetFloatv (GL_PROJECTION_MATRIX, m);
+//        debugDataGL(m);
+        glGetFloatv (GL_PROJECTION_MATRIX, m);
+//        debugDataGL(m);
+//        Debugger::promptOpenGLError();
+        const qreal* data2= (M*V).data();
+        for (int i = 0; i < 16; ++i) {
+            matrix[i] = data2[i];
+        }
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+//        glMultMatrixd(matrix);
+//        debugDataGL(matrix);
+
+    }
+}
+
+void Viewer::debugData(const qreal* data){
+    for (int i = 0; i < 4; ++i) {
+        qDebug()<<data[i*4]<<" "<<data[i*4 +1]<<" "<<data[i*4 +2]<<" "<<data[i*4 +3]<<" ";
+    }
+}
+void Viewer::debugDataGL(const GLfloat* data){
+    for (int i = 0; i < 4; ++i) {
+        qDebug()<<data[i*4]<<" "<<data[i*4 +1]<<" "<<data[i*4 +2]<<" "<<data[i*4 +3]<<" ";
+    }
 }
 
 void Viewer::displayFullTextured(int x, int y, int width, int height){
@@ -191,7 +246,7 @@ void Viewer::display2D(){
 //    _program->setUniformValue("P",proj);
     QMatrix4x4 pvm = proj;
 //    _program->setUniformValue("pvm",pvm);
-    _program->release();
+    releaseProgram();
 //    if(_background_activated) {
 //        GLint tex_size[0];
 //        glBindTexture(GL_TEXTURE_2D, _textures[0]);
@@ -232,7 +287,7 @@ void Viewer::display2D(){
 //            }
 //    }
 //    stopScreenCoordinatesSystem();
-    _program->bind();
+    bindProgram();
     glEnable(GL_DEPTH_TEST);
 //    glEnable(GL_LIGHTING);
 }
@@ -253,7 +308,8 @@ void Viewer::init()
 
 
     glClearColor(0.2,0.2,0.2,1);
-    startShaders();
+    if(GlobalConfig::is_enabled("shaders"))
+        startShaders();
     _timer_fps= new QTimer();
     _timer_fps->setInterval(1000);
     _timer_fps->connect(_timer_fps, SIGNAL(timeout()),this, SLOT(framepersecond()));
@@ -270,7 +326,7 @@ void Viewer::init()
     P.ortho(-1,1,-1,1,-1,1);
     P.perspective(90,4/3,.1,1);
     _ui->get_camera().set_projection_matrix(P);
-    _program->setUniformValue("P",P);
+//    _program->setUniformValue("P",P);
     _initiated = true;
 }
 
