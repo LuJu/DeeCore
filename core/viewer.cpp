@@ -174,7 +174,11 @@ void Viewer::insertMatrices(const QMatrix4x4& P,const QMatrix4x4& V,const QMatri
     _program->setUniformValue("pvm",P*V*M);
     } else {
         GLfloat matrix[16];
+#ifdef QT_4_
+        const qreal* data = (P).transposed().data();
+#else
         const float* data = (P).transposed().data();
+#endif
         for (int i = 0; i < 16; ++i) {
             matrix[i] = data[i];
         }
@@ -193,7 +197,11 @@ void Viewer::insertMatrices(const QMatrix4x4& P,const QMatrix4x4& V,const QMatri
         glGetFloatv (GL_PROJECTION_MATRIX, m);
 //        debugDataGL(m);
 //        Debugger::promptOpenGLError();
+#ifdef QT_4_
+        const qreal* data2= (M*V).data();
+#else
         const float* data2= (M*V).data();
+#endif
         for (int i = 0; i < 16; ++i) {
             matrix[i] = data2[i];
         }
