@@ -66,9 +66,9 @@ void Viewer::draw()
     V.translate(camera.get_position().x(),
                 camera.get_position().y(),
                 camera.get_position().z());
-    qDebug()<<"position"<<camera.get_position().x()<<" "<<
-              camera.get_position().y()<<" "<<
-              camera.get_position().z()<<" ";
+//    qDebug()<<"position"<<camera.get_position().x()<<" "<<
+//              camera.get_position().y()<<" "<<
+//              camera.get_position().z()<<" ";
     V.scale(scale,scale,scale);
     V.rotate(_ui->_quaternion);
     V.rotate(camera.get_rotation());
@@ -77,7 +77,7 @@ void Viewer::draw()
 //    _program->setUniformValue("V",V);
 
     QMatrix4x4 P;
-    P.ortho(-1000,1000,-1000,1000,-1000,1000);
+    P.ortho(-10,10,-10,10,-1000,1000);
 //    P.perspective(_ui->fov,4.0f/3.0f,0.1f,100.0f);
     _ui->get_camera().set_projection_matrix(P);
 //    _program->setUniformValue("P",P);

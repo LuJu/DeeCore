@@ -12,7 +12,7 @@ UIState::UIState():
     _progressive_zoom._targeted=_zoom_level;
     _progressive_zoom._activated = false;
     _progressive_zoom._speed = 1;
-    _camera.set_position(Point3df(-9,-28.5,92));
+    _camera.set_position(Point3df(0,0,-1));
     fov=90;
 }
 
@@ -41,12 +41,14 @@ UIState::~UIState(){
 }
 
 void UIState::changeZoom(int delta){
+    int max_zoom = 1000;
+
     if (!_progressive_zoom._activated){
-        if(_zoom_level+delta > 30000)     _zoom_level = 30000 ;
+        if(_zoom_level+delta > max_zoom)     _zoom_level = max_zoom ;
         else if (_zoom_level+delta < 0) _zoom_level = 0 ;
         else _zoom_level = _zoom_level+delta;
     } else {
-        if(_progressive_zoom._targeted+delta > 30000)     _progressive_zoom._targeted = 30000 ;
+        if(_progressive_zoom._targeted+delta > max_zoom)     _progressive_zoom._targeted = max_zoom ;
         else if (_progressive_zoom._targeted+delta < 0) _progressive_zoom._targeted = 0 ;
         else _progressive_zoom._targeted = _progressive_zoom._targeted+delta;
     }
@@ -81,22 +83,22 @@ void UIState::actionProcess(){
         if(_actions[i]==true){
             switch (i){
             case left:
-                _camera.move(Point3df(-3,0,0));
+                _camera.move(Point3df(.1,0,0));
                 break;
             case right:
-                _camera.move(Point3df(3,0,0));
+                _camera.move(Point3df(-.1,0,0));
                 break;
             case up:
-                _camera.move(Point3df(0,3,0));
+                _camera.move(Point3df(0,-.1,0));
                 break;
             case down:
-                _camera.move(Point3df(0,-3,0));
+                _camera.move(Point3df(0,.1,0));
                 break;
             case forward:
-                _camera.move(Point3df(0,0,-3));
+                changeZoom(5);
                 break;
             case backward:
-                _camera.move(Point3df(0,0,3));
+                changeZoom(-5);
                 break;
 //            case a_:
 //                fov++;
