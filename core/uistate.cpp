@@ -100,10 +100,6 @@ void UIState::actionProcess(){
             case backward:
                 changeZoom(-5);
                 break;
-//            case a_:
-//                fov++;
-//                qDebug()<<fov;
-//                break ;
             case ru:
                 q = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0),1);
                 _camera.set_rotation( _camera.get_rotation()* q);

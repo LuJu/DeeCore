@@ -66,9 +66,6 @@ void Viewer::draw()
     V.translate(camera.get_position().x(),
                 camera.get_position().y(),
                 camera.get_position().z());
-//    qDebug()<<"position"<<camera.get_position().x()<<" "<<
-//              camera.get_position().y()<<" "<<
-//              camera.get_position().z()<<" ";
     V.scale(scale,scale,scale);
     V.rotate(_ui->_quaternion);
     V.rotate(camera.get_rotation());
@@ -90,22 +87,10 @@ void Viewer::draw()
 
 void Viewer::resizeGL(int width, int height){
     QMatrix4x4 P;
-//    P.ortho(-1000,1000,-1000,1000,-1000,1000);
     P.perspective(_ui->fov,4.0f/3.0f,0.0001f,10000000.0f);
     _ui->get_camera().set_projection_matrix(P);
-//    _program->setUniformValue("P",P);
     int side = qMin(width, height);
     glViewport(0,0, width, height);
-//    glViewport(0, 0, width, height);
-
-//    glMatrixMode(GL_PROJECTION);
-//    glLoadIdentity();
-//#ifdef QT_OPENGL_ES_1
-//    glOrthof(-0.5, +0.5, -0.5, +0.5, 4.0, 15.0);
-//#else
-//    glOrtho(-0.5, +0.5, -0.5, +0.5, -0.5, +0.5);
-//#endif
-//    glMatrixMode(GL_MODELVIEW);
 }
 
 
@@ -307,13 +292,6 @@ void Viewer::init()
     _input = new InputManager();
     _ui = new UIState();
     _input->set_ui(_ui);
-
-    qDebug() << "OpenGL Versions Supported: " << QGLFormat::openGLVersionFlags();
-
-    QString versionString(QLatin1String(reinterpret_cast<const char*>(glGetString(GL_VERSION))));
-    qDebug() << "Driver Version String:" << versionString;
-    qDebug() << "Current Context:" << format();
-
 
     glClearColor(0.2,0.2,0.2,1);
     if(GlobalConfig::is_enabled("shaders"))
