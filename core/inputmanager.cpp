@@ -123,8 +123,7 @@ void InputManager::wheelEvent(int orientation, int delta, QPoint pos)
 {
 
     if (orientation==Qt::Vertical){
-        _ui->changeZoom(delta);
-//        _ui->set_x(_ui->get_x()+delta/15);
+        _ui->changeZoom(delta/5);
     } else if (orientation==Qt::Horizontal){
     }
 //        if(abs(delta)>=100)

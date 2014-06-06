@@ -11,7 +11,6 @@ Viewer::Viewer(const QGLFormat &format) :
     _timer_fps(NULL),
     _timer_start(NULL),
     _initiated(false){
-    __build();
 }
 Viewer::Viewer(QGLContext * context) :
     QGLWidget(context),
@@ -20,7 +19,6 @@ Viewer::Viewer(QGLContext * context) :
     _timer_fps(NULL),
     _timer_start(NULL),
     _initiated(false){
-    __build();
 }
 Viewer::Viewer(QWidget * parent, const QGLWidget * shareWidget, Qt::WindowFlags f) :
     QGLWidget(parent,shareWidget,f),
@@ -29,7 +27,6 @@ Viewer::Viewer(QWidget * parent, const QGLWidget * shareWidget, Qt::WindowFlags 
     _timer_fps(NULL),
     _timer_start(NULL),
     _initiated(false){
-    __build();
 }
 
 Viewer::~Viewer(){
@@ -60,7 +57,7 @@ void Viewer::draw()
     glEnable(GL_DEPTH_TEST);
 
     QMatrix4x4 V;
-    float scale = (((float)_ui->get_zoom())/100)+0.5;
+    float scale = (((float)_ui->get_zoom())/10)+0.05;
 
     Camera& camera = _ui->get_camera();
     V.translate(camera.get_position().x(),
@@ -74,16 +71,12 @@ void Viewer::draw()
 //    _program->setUniformValue("V",V);
 
     QMatrix4x4 P;
-    P.ortho(-10,10,-10,10,-1000,1000);
-//    P.perspective(_ui->fov,4.0f/3.0f,0.1f,100.0f);
+//    P.ortho(-10,10,-10,10,-1000,1000);
+    P.perspective(_ui->fov,4.0f/3.0f,0.1f,100.0f);
     _ui->get_camera().set_projection_matrix(P);
 //    _program->setUniformValue("P",P);
-//    qDebug()<<"position : "<<camera.get_position().x()<<" "<<camera.get_position().y()<<" "<<camera.get_position().z();
 //    _ui->get_camera().debug(V);
-//    _program->setUniformValue("view_direction",QVector3D(_ui->get_camera().get_view_matrix().column(3)));
-
-
-}
+    }
 
 void Viewer::resizeGL(int width, int height){
     QMatrix4x4 P;
@@ -106,11 +99,8 @@ void Viewer::startShaders(){
         _program->addShader(_shaders[1]);
 //        _program->addShader(_shaders[2]);
 
-        if(_program->link()) qDebug()<<"Link success";
-        else {
-            qCritical()<<"Fail to link shader program";
-        }
-        if(_program->bind()) qDebug()<<"Bind success";
+        if(!_program->link()) qCritical()<<"Fail to link shader program";
+        if(!_program->bind()) qCritical()<<"Fail to link shader program";
 }
 
 QGLShader * Viewer::compileShader(const char * path, QGLShader::ShaderType type){
@@ -321,6 +311,7 @@ void Viewer::init()
     _timer_fps->connect(_timer_fps, SIGNAL(timeout()),this, SLOT(framepersecond()));
     _timer_fps->start();
     _frame=0;
+    _current_fps = 0;
     _background_activated=false;
 
     _timer_start = new QTimer(this);
@@ -351,7 +342,8 @@ void Viewer::framepersecond()
 {
     if(GlobalConfig::is_enabled("output_fps"))
         qDebug()<<"FPS : "<<_frame;
-     _frame=0;
+    _current_fps = _frame;
+    _frame=0;
 }
 
 void Viewer::addTo3DDisplayList(GraphicObject3D * object){

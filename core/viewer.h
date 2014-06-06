@@ -63,6 +63,7 @@ public:
 
     QVector<GLuint> textures() const;
     void setTextures(const QVector<GLuint> &textures);
+    int get_fps() const {return _current_fps;}
 
 public slots :
     void framepersecond();
@@ -114,6 +115,7 @@ protected :
 
     //! The count of frames passed since the beginning of the last second
     int _frame;
+    int _current_fps;
 
     //! Timer used for FPS count
     QTimer * _timer_fps;
@@ -125,7 +127,6 @@ protected :
     void bindProgram();
 
 private :
-    void __build(){/*init();*/}
     GLint _viewport[4];
     QGLShader * compileShader(const char * path, QGLShader::ShaderType type);
     void initializeGL(){init();}

@@ -19,22 +19,10 @@ UIState::UIState():
 
 //not working
 void UIState::loadPreviousState(){
-    _quaternion = _quaternion.fromAxisAndAngle(
-                GlobalConfig::get_float("quaternion_x"),
-                GlobalConfig::get_float("quaternion_y"),
-                GlobalConfig::get_float("quaternion_z"),
-                GlobalConfig::get_float("quaternion_w"));
-    _zoom_level=GlobalConfig::get_int("zoom");
 }
 
 //not working
 void UIState::saveState(){
-    _quaternion.normalize();
-    GlobalConfig::set_float("quaternion_x",_quaternion.x());
-    GlobalConfig::set_float("quaternion_y",_quaternion.y());
-    GlobalConfig::set_float("quaternion_z",_quaternion.z());
-    GlobalConfig::set_float("quaternion_w",_quaternion.scalar());
-    GlobalConfig::set_int("zoom",_zoom_level);
 }
 
 UIState::~UIState(){
@@ -65,7 +53,6 @@ void UIState::rotate(QPoint mouse_coordinates){
     float xangle,yangle;
     xangle = - mouse_coordinates.x();
     yangle =   mouse_coordinates.y();
-//    _mouse_pos = mouse_coordinates;
     QVector3D vector = QVector3D::crossProduct(QVector3D(xangle,yangle,0),QVector3D(0,0,1));
 
     QQuaternion quaternion = QQuaternion::fromAxisAndAngle(vector,mouse_coordinates.manhattanLength());
