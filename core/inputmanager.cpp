@@ -103,11 +103,12 @@ void InputManager::mouseEvent( int eventType, QPoint pos, int key)
         }
         break;
     case Moved:
-        switch (_ui->_type) {
-        case UIState::camera2D:
+        switch (_ui->get_camera().get_projection_type()) {
+        case Camera::two_dimensions:
             _ui->get_camera().move(Point3df(-pos.x(),pos.y(),0));
             break;
-        case UIState::camera3D:
+        case Camera::orthographic:
+        case Camera::perspective:
             _ui->rotate(pos);
             break;
         default:

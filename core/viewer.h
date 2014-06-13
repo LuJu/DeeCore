@@ -71,6 +71,7 @@ public slots :
 
 
 protected :
+    void updateProjection();
     virtual void draw();
     virtual void init();
 
@@ -103,6 +104,8 @@ protected :
 
     void updateMatrices(const QMatrix4x4& P,const QMatrix4x4& V,const QMatrix4x4& M);
     void updateModelMatrix(const QMatrix4x4 M);
+    void updateProjectionMatrix(const QMatrix4x4 P);
+    void updateViewMatrix(const QMatrix4x4 V);
 
     QGLShaderProgram * _program;
     QGLShader * _shaders[3];
@@ -125,6 +128,8 @@ protected :
     bool _background_activated;
     void releaseProgram();
     void bindProgram();
+
+    QMatrix4x4 _model_matrix;
 
 private :
     GLint _viewport[4];

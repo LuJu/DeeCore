@@ -7,12 +7,13 @@ UIState::UIState():
     _action_done=false;
     for (int i=0;i<NUMBER_OF_ACTIONS;i++) _actions[i]=false;
     _paused=false;
-    _type = camera3D;
     loadPreviousState();
     _progressive_zoom._targeted=_zoom_level;
     _progressive_zoom._activated = false;
     _progressive_zoom._speed = 1;
-    _camera.set_position(Point3df(0,0,-1));
+    _camera.set_position(Point3df(0,0,-1.0));
+    QQuaternion quat = QQuaternion::fromAxisAndAngle(1,0,0,15);
+    _camera.set_rotation(quat);
     fov=90;
 }
 
@@ -29,7 +30,7 @@ UIState::~UIState(){
 }
 
 void UIState::changeZoom(int delta){
-    int max_zoom = 1000;
+    int max_zoom = 100;
 
     if (!_progressive_zoom._activated){
         if(_zoom_level+delta > max_zoom)     _zoom_level = max_zoom ;
@@ -44,7 +45,6 @@ void UIState::changeZoom(int delta){
 }
 
 void UIState::displayCameraInformation(){
-//    qDebug()<<"Position :"<<_camera.get_position().x()<<" "<<_camera.get_position().y()<<" "<<_camera.get_position().z();
     qDebug()<<"zoom :"<<_zoom_level;
 }
 
@@ -58,6 +58,7 @@ void UIState::rotate(QPoint mouse_coordinates){
     QQuaternion quaternion = QQuaternion::fromAxisAndAngle(vector,mouse_coordinates.manhattanLength());
 
     _quaternion = quaternion *_quaternion ;
+    _camera.set_rotation(_quaternion);
 }
 
 void UIState::updateState(){

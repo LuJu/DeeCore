@@ -37,8 +37,11 @@ class Camera
 public:
     enum Projection{
         orthographic,
-        perspective
+        perspective,
+        two_dimensions
     };
+
+    Projection get_projection_type(){return _projection_type;}
 
     Camera();
 
@@ -48,7 +51,7 @@ public:
     Vector3df _up_vector;
     QQuaternion _rotation;
 
-
+    Projection _projection_type;
 
     // for projection types
     float _znear;
@@ -73,12 +76,18 @@ public:
     void computePerspective(){
         _projection.perspective(rad2deg(_field_of_view),_aspect_ratio,_znear,_zfar);
     }
-//    void computeView(){
-//        _view.
-//    }
+    mutable bool _matrix_and_data_matching;
 
     void set_rotation(const QQuaternion & rotation){
         _rotation = rotation;
+        recomputeViewMatrix();
+    }
+
+    void recomputeViewMatrix() {
+        _view.setToIdentity();
+        _view.translate(_position.x(),_position.y(),_position.z());
+        _view.scale(_scale.x(),_scale.y(),_scale.z());
+        _view.rotate(_rotation);
     }
 
     const QQuaternion& get_rotation() const {
@@ -86,19 +95,26 @@ public:
     }
 
     const Point3df& get_position() const {return _position;}
-    void set_position(const Point3df& position){_position = position;}
+    void set_position(const Point3df& position){_position = position;
+                                               recomputeViewMatrix();}
+
+    void set_scale(const Point3df& scale){_scale = scale;
+                                         recomputeViewMatrix();}
+    const Point3df& get_scale() const {return _scale;}
+    Point3df _scale;
 
     void move(Point3df distance){
         _position += distance;
+        recomputeViewMatrix();
     }
 
-    void debug()const{
+    void toString()const{
         qDebug()<<"["<<_view(0,0)<<" "<<_view(0,1)<<" "<<_view(0,2)<<" "<<_view(0,3);
         qDebug()<<"["<<_view(1,0)<<" "<<_view(1,1)<<" "<<_view(1,2)<<" "<<_view(1,3);
         qDebug()<<"["<<_view(2,0)<<" "<<_view(2,1)<<" "<<_view(2,2)<<" "<<_view(2,3);
         qDebug()<<"["<<_view(3,0)<<" "<<_view(3,1)<<" "<<_view(3,2)<<" "<<_view(3,3);
     }
-    void debug(QMatrix4x4 _view)const{
+    void toString(QMatrix4x4 _view)const{
         qDebug()<<"["<<_view(0,0)<<" "<<_view(0,1)<<" "<<_view(0,2)<<" "<<_view(0,3);
         qDebug()<<"["<<_view(1,0)<<" "<<_view(1,1)<<" "<<_view(1,2)<<" "<<_view(1,3);
         qDebug()<<"["<<_view(2,0)<<" "<<_view(2,1)<<" "<<_view(2,2)<<" "<<_view(2,3);

@@ -56,36 +56,57 @@ void Viewer::draw()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
-    QMatrix4x4 V;
-    float scale = (((float)_ui->get_zoom())/10)+0.05;
+    QMatrix4x4 V,P;
+    float scale = (((float)_ui->get_zoom())/100)+1.0f;
 
     Camera& camera = _ui->get_camera();
-    V.translate(camera.get_position().x(),
-                camera.get_position().y(),
-                camera.get_position().z());
-    V.scale(scale,scale,scale);
-    V.rotate(_ui->_quaternion);
-    V.rotate(camera.get_rotation());
-    _ui->get_camera().set_view_matrix(V);
+    camera.set_scale(Point3df(scale,scale,scale));
+    V = camera.get_view_matrix();
 
-//    _program->setUniformValue("V",V);
+//    switch (camera.get_projection_type()) {
+//    case Camera::orthographic:
+//        P.ortho(-3,3,-1,5,-1000,1000);
+//        break;
+//    case Camera::perspective:
+//        P.perspective(_ui->fov,4.0f/3.0f,0.1f,100.0f);
+//    case Camera::two_dimensions:
+//        P.ortho(-10,10,-10,10,-1,1);
+//    default:
+//        break;
+//    }
+//    camera.set_projection_matrix(P);
 
-    QMatrix4x4 P;
-//    P.ortho(-10,10,-10,10,-1000,1000);
-    P.perspective(_ui->fov,4.0f/3.0f,0.1f,100.0f);
-    _ui->get_camera().set_projection_matrix(P);
-//    _program->setUniformValue("P",P);
-//    _ui->get_camera().debug(V);
-    }
-
-void Viewer::resizeGL(int width, int height){
-    QMatrix4x4 P;
-    P.perspective(_ui->fov,4.0f/3.0f,0.0001f,10000000.0f);
-    _ui->get_camera().set_projection_matrix(P);
-    int side = qMin(width, height);
-    glViewport(0,0, width, height);
+    updateProjection();
 }
 
+void Viewer::resizeGL(int width, int height){
+//    QMatrix4x4 P;
+//    P.perspective(_ui->fov,4.0f/3.0f,0.0001f,10000000.0f);
+//    _ui->get_camera().set_projection_matrix(P);
+//    int side = qMin(width, height);
+//    glViewport(0,0, width, height);
+    updateProjection();
+}
+void Viewer::updateProjection(){
+    float window_width = width();
+    float window_height = height();
+    float frame_width = window_width / 100.f;
+    float frame_height = window_height / 100.f;
+    Camera& camera = _ui->get_camera();
+    QMatrix4x4 P;
+    switch (camera.get_projection_type()) {
+    case Camera::orthographic:
+        P.ortho(-frame_width/2,frame_width/2,1 - frame_height/2 ,1 + frame_height/2,-1000,1000);
+        break;
+    case Camera::perspective:
+        P.perspective(_ui->fov,4.0f/3.0f,0.1f,100.0f);
+    case Camera::two_dimensions:
+        P.ortho(-10,10,-10,10,-1,1);
+    default:
+        break;
+    }
+    camera.set_projection_matrix(P);
+}
 
 void Viewer::startShaders(){
         _program = new QGLShaderProgram(this);
@@ -145,8 +166,25 @@ void Viewer::updateModelMatrix(const QMatrix4x4 M){
     if (GlobalConfig::is_enabled("shaders")){
         const QMatrix4x4& V=_ui->get_camera().get_view_matrix();
         const QMatrix4x4& P=_ui->get_camera().get_projection_matrix();
+        _model_matrix = M;
         _program->setUniformValue("M",M);
         _program->setUniformValue("pvm",P*V*M);
+    }
+}
+void Viewer::updateProjectionMatrix(const QMatrix4x4 P){
+    if (GlobalConfig::is_enabled("shaders")){
+        const QMatrix4x4& V=_ui->get_camera().get_view_matrix();
+        _ui->get_camera().set_projection_matrix(P);
+        _program->setUniformValue("P",P);
+        _program->setUniformValue("pvm",P*V*_model_matrix);
+    }
+}
+void Viewer::updateViewMatrix(const QMatrix4x4 V){
+    if (GlobalConfig::is_enabled("shaders")){
+        const QMatrix4x4& P=_ui->get_camera().get_projection_matrix();
+        _ui->get_camera().set_view_matrix(V);
+        _program->setUniformValue("V",V);
+        _program->setUniformValue("pvm",P*V*_model_matrix);
     }
 }
 //void Viewer::updateViewMatrix(){
@@ -163,6 +201,9 @@ void Viewer::updateModelMatrix(const QMatrix4x4 M){
 
 void Viewer::updateMatrices(const QMatrix4x4& P,const QMatrix4x4& V,const QMatrix4x4& M){
     if (GlobalConfig::is_enabled("shaders")){
+        _ui->get_camera().set_view_matrix(V);
+        _ui->get_camera().set_projection_matrix(P);
+        _model_matrix = M;
         _program->setUniformValue("M",M);
         _program->setUniformValue("V",V);
         _program->setUniformValue("P",P);
@@ -177,21 +218,13 @@ void Viewer::updateMatrices(const QMatrix4x4& P,const QMatrix4x4& V,const QMatri
         for (int i = 0; i < 16; ++i) {
             matrix[i] = data[i];
         }
-//        debugData(data);
-//        Debugger::promptOpenGLError();
         debugDataGL(matrix);
-//        Debugger::promptOpenGLError();
         glMatrixMode(GL_PROJECTION);
-//        Debugger::promptOpenGLError();
         glLoadIdentity();
         glMultMatrixf(matrix);
         GLfloat m[16];
-//        debugDataGL(m);
         glGetFloatv (GL_PROJECTION_MATRIX, m);
-//        debugDataGL(m);
         glGetFloatv (GL_PROJECTION_MATRIX, m);
-//        debugDataGL(m);
-//        Debugger::promptOpenGLError();
 #ifdef QT_4_
         const qreal* data2= (M*V).data();
 #else
@@ -202,9 +235,6 @@ void Viewer::updateMatrices(const QMatrix4x4& P,const QMatrix4x4& V,const QMatri
         }
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-//        glMultMatrixd(matrix);
-//        debugDataGL(matrix);
-
     }
 }
 

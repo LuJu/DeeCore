@@ -1,5 +1,6 @@
 #include "camera.h"
 
-Camera::Camera()
+Camera::Camera():
+    _projection_type(orthographic)
 {
 }
