@@ -41,11 +41,11 @@ void Viewer::deleteData(){
     if (_initiated){
         if (_timer_fps) delete _timer_fps;
         if (_timer_start) delete _timer_start;
-        if(GlobalConfig::is_enabled("shaders")){
-            for (int i = 0; i < 3; ++i) {
-                if (_shaders[i]) delete _shaders[i];
-            }
+//        if(GlobalConfig::is_enabled("shaders")){
+        for (int i = 0; i < 3; ++i) {
+            if (_shaders[i]) delete _shaders[i];
         }
+//        }
         if (_ui) delete _ui;
         if (_input) delete _input;
     }
@@ -53,6 +53,8 @@ void Viewer::deleteData(){
 
 void Viewer::draw()
 {
+     int ret=0;
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
@@ -152,40 +154,40 @@ void Viewer::display3DObjects(){
 }
 
 void Viewer::bindProgram(){
-    if (GlobalConfig::is_enabled("shaders_activated"))
-        bindProgram();
+//    if (GlobalConfig::is_enabled("shaders_activated"))
+    bindProgram();
 }
 
 void Viewer::releaseProgram(){
-    if (GlobalConfig::is_enabled("shaders_activated"))
-        releaseProgram();
+//    if (GlobalConfig::is_enabled("shaders_activated"))
+    releaseProgram();
 
 }
 
 void Viewer::updateModelMatrix(const QMatrix4x4 M){
-    if (GlobalConfig::is_enabled("shaders")){
-        const QMatrix4x4& V=_ui->get_camera().get_view_matrix();
-        const QMatrix4x4& P=_ui->get_camera().get_projection_matrix();
-        _model_matrix = M;
-        _program->setUniformValue("M",M);
-        _program->setUniformValue("pvm",P*V*M);
-    }
+//    if (GlobalConfig::is_enabled("shaders")){
+    const QMatrix4x4& V=_ui->get_camera().get_view_matrix();
+    const QMatrix4x4& P=_ui->get_camera().get_projection_matrix();
+    _model_matrix = M;
+    _program->setUniformValue("M",M);
+    _program->setUniformValue("pvm",P*V*M);
+//    }
 }
 void Viewer::updateProjectionMatrix(const QMatrix4x4 P){
-    if (GlobalConfig::is_enabled("shaders")){
-        const QMatrix4x4& V=_ui->get_camera().get_view_matrix();
-        _ui->get_camera().set_projection_matrix(P);
-        _program->setUniformValue("P",P);
-        _program->setUniformValue("pvm",P*V*_model_matrix);
-    }
+//    if (GlobalConfig::is_enabled("shaders")){
+    const QMatrix4x4& V=_ui->get_camera().get_view_matrix();
+    _ui->get_camera().set_projection_matrix(P);
+    _program->setUniformValue("P",P);
+    _program->setUniformValue("pvm",P*V*_model_matrix);
+//    }
 }
 void Viewer::updateViewMatrix(const QMatrix4x4 V){
-    if (GlobalConfig::is_enabled("shaders")){
-        const QMatrix4x4& P=_ui->get_camera().get_projection_matrix();
-        _ui->get_camera().set_view_matrix(V);
-        _program->setUniformValue("V",V);
-        _program->setUniformValue("pvm",P*V*_model_matrix);
-    }
+//    if (GlobalConfig::is_enabled("shaders")){
+    const QMatrix4x4& P=_ui->get_camera().get_projection_matrix();
+    _ui->get_camera().set_view_matrix(V);
+    _program->setUniformValue("V",V);
+    _program->setUniformValue("pvm",P*V*_model_matrix);
+//    }
 }
 //void Viewer::updateViewMatrix(){
 
@@ -200,42 +202,42 @@ void Viewer::updateViewMatrix(const QMatrix4x4 V){
 //}
 
 void Viewer::updateMatrices(const QMatrix4x4& P,const QMatrix4x4& V,const QMatrix4x4& M){
-    if (GlobalConfig::is_enabled("shaders")){
-        _ui->get_camera().set_view_matrix(V);
-        _ui->get_camera().set_projection_matrix(P);
-        _model_matrix = M;
-        _program->setUniformValue("M",M);
-        _program->setUniformValue("V",V);
-        _program->setUniformValue("P",P);
-        _program->setUniformValue("pvm",P*V*M);
-    } else {
-        GLfloat matrix[16];
-#ifdef QT_4_
-        const qreal* data = (P).transposed().data();
-#else
-        const float* data = (P).transposed().data();
-#endif
-        for (int i = 0; i < 16; ++i) {
-            matrix[i] = data[i];
-        }
-        debugDataGL(matrix);
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glMultMatrixf(matrix);
-        GLfloat m[16];
-        glGetFloatv (GL_PROJECTION_MATRIX, m);
-        glGetFloatv (GL_PROJECTION_MATRIX, m);
-#ifdef QT_4_
-        const qreal* data2= (M*V).data();
-#else
-        const float* data2= (M*V).data();
-#endif
-        for (int i = 0; i < 16; ++i) {
-            matrix[i] = data2[i];
-        }
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-    }
+//    if (GlobalConfig::is_enabled("shaders")){
+    _ui->get_camera().set_view_matrix(V);
+    _ui->get_camera().set_projection_matrix(P);
+    _model_matrix = M;
+    _program->setUniformValue("M",M);
+    _program->setUniformValue("V",V);
+    _program->setUniformValue("P",P);
+    _program->setUniformValue("pvm",P*V*M);
+//    } else {
+//        GLfloat matrix[16];
+//#ifdef QT_4_
+//        const qreal* data = (P).transposed().data();
+//#else
+//        const float* data = (P).transposed().data();
+//#endif
+//        for (int i = 0; i < 16; ++i) {
+//            matrix[i] = data[i];
+//        }
+//        debugDataGL(matrix);
+//        glMatrixMode(GL_PROJECTION);
+//        glLoadIdentity();
+//        glMultMatrixf(matrix);
+//        GLfloat m[16];
+//        glGetFloatv (GL_PROJECTION_MATRIX, m);
+//        glGetFloatv (GL_PROJECTION_MATRIX, m);
+//#ifdef QT_4_
+//        const qreal* data2= (M*V).data();
+//#else
+//        const float* data2= (M*V).data();
+//#endif
+//        for (int i = 0; i < 16; ++i) {
+//            matrix[i] = data2[i];
+//        }
+//        glMatrixMode(GL_MODELVIEW);
+//        glLoadIdentity();
+//    }
 }
 
 void Viewer::debugData(const qreal* data){
@@ -334,8 +336,8 @@ void Viewer::init()
     _input->set_ui(_ui);
 
     glClearColor(0.2,0.2,0.2,1);
-    if(GlobalConfig::is_enabled("shaders"))
-        startShaders();
+//    if(GlobalConfig::is_enabled("shaders"))
+    startShaders();
     _timer_fps= new QTimer();
     _timer_fps->setInterval(1000);
     _timer_fps->connect(_timer_fps, SIGNAL(timeout()),this, SLOT(framepersecond()));

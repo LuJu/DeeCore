@@ -30,7 +30,7 @@ UIState::~UIState(){
 }
 
 void UIState::changeZoom(int delta){
-    int max_zoom = 100;
+    int max_zoom = 150;
 
     if (!_progressive_zoom._activated){
         if(_zoom_level+delta > max_zoom)     _zoom_level = max_zoom ;

@@ -11,15 +11,12 @@ void Debugger::customMessageHandler(QtMsgType type, const char *msg)
     switch (type) {
     case QtDebugMsg:
         txt = QString("%2 Debug   : %1").arg(msg).arg(time);
-        if(!GlobalConfig::is_enabled("debug_output_debug")) output_stderr=false;
     break;
     case QtWarningMsg:
         txt = QString("%2 Warning : %1").arg(msg).arg(time);
-        if(!GlobalConfig::is_enabled("debug_output_warning")) output_stderr=false;
     break;
     case QtCriticalMsg:
         txt = QString("%2 Critical: %1").arg(msg).arg(time);
-        if(!GlobalConfig::is_enabled("debug_output_critical")) output_stderr=false;
     break;
     case QtFatalMsg:
         txt = QString("%2 Fatal   : %1").arg(msg).arg(time);
