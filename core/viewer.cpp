@@ -155,12 +155,12 @@ void Viewer::display3DObjects(){
 
 void Viewer::bindProgram(){
 //    if (GlobalConfig::is_enabled("shaders_activated"))
-    bindProgram();
+//    bindProgram();
 }
 
 void Viewer::releaseProgram(){
 //    if (GlobalConfig::is_enabled("shaders_activated"))
-    releaseProgram();
+//    releaseProgram();
 
 }
 
