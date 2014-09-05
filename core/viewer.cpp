@@ -1,9 +1,6 @@
 #include "viewer.h"
 
 using namespace std;
-//using namespace qglviewer;
-
-
 Viewer::Viewer(const QGLFormat &format) :
     QGLWidget(format),
     _ui(NULL),
@@ -30,10 +27,6 @@ Viewer::Viewer(QWidget * parent, const QGLWidget * shareWidget, Qt::WindowFlags 
 }
 
 Viewer::~Viewer(){
-//    if (_main_viewer) {
-//        _ui->saveState();
-//        GlobalConfig::saveConfiguration();
-//    }
     deleteData();
 }
 
@@ -41,11 +34,9 @@ void Viewer::deleteData(){
     if (_initiated){
         if (_timer_fps) delete _timer_fps;
         if (_timer_start) delete _timer_start;
-//        if(GlobalConfig::is_enabled("shaders")){
         for (int i = 0; i < 3; ++i) {
             if (_shaders[i]) delete _shaders[i];
         }
-//        }
         if (_ui) delete _ui;
         if (_input) delete _input;
     }
@@ -53,8 +44,6 @@ void Viewer::deleteData(){
 
 void Viewer::draw()
 {
-     int ret=0;
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
@@ -62,21 +51,9 @@ void Viewer::draw()
     float scale = (((float)_ui->get_zoom())/100)+1.0f;
 
     Camera& camera = _ui->get_camera();
+    camera.set_scale(Point3df(1,1,1));
     camera.set_scale(Point3df(scale,scale,scale));
     V = camera.get_view_matrix();
-
-//    switch (camera.get_projection_type()) {
-//    case Camera::orthographic:
-//        P.ortho(-3,3,-1,5,-1000,1000);
-//        break;
-//    case Camera::perspective:
-//        P.perspective(_ui->fov,4.0f/3.0f,0.1f,100.0f);
-//    case Camera::two_dimensions:
-//        P.ortho(-10,10,-10,10,-1,1);
-//    default:
-//        break;
-//    }
-//    camera.set_projection_matrix(P);
 
     updateProjection();
 }
@@ -87,11 +64,10 @@ void Viewer::resizeGL(int width, int height){
 //    _ui->get_camera().set_projection_matrix(P);
 //    int side = qMin(width, height);
 //    glViewport(0,0, width, height);
-    updateProjection();
-}
-void Viewer::updateProjection(){
-    float window_width = width();
-    float window_height = height();
+//    updateProjection();
+
+    float window_width = width;
+    float window_height = height;
     float frame_width = window_width / 100.f;
     float frame_height = window_height / 100.f;
     Camera& camera = _ui->get_camera();
@@ -99,15 +75,40 @@ void Viewer::updateProjection(){
     switch (camera.get_projection_type()) {
     case Camera::orthographic:
         P.ortho(-frame_width/2,frame_width/2,1 - frame_height/2 ,1 + frame_height/2,-1000,1000);
+//        P.ortho(-10,10,-10,10,-1000,1000);
         break;
     case Camera::perspective:
-        P.perspective(_ui->fov,4.0f/3.0f,0.1f,100.0f);
+        P.perspective(75.0f,4.0f/3.0f,0.1f,10.0f);
     case Camera::two_dimensions:
         P.ortho(-10,10,-10,10,-1,1);
     default:
         break;
     }
     camera.set_projection_matrix(P);
+    updateProjectionMatrix(P);
+}
+void Viewer::updateProjection(){
+//    float window_width = width();
+//    float window_height = height();
+//    float frame_width = window_width / 100.f;
+//    float frame_height = window_height / 100.f;
+//    Camera& camera = _ui->get_camera();
+//    QMatrix4x4 P;
+//    switch (camera.get_projection_type()) {
+//    case Camera::orthographic:
+////        P.ortho(-frame_width/2,frame_width/2,-frame_height/2 ,frame_height/2,-1000,1000);
+//        P.ortho(-10,10,-10,10,-1000,1000);
+//        break;
+//    case Camera::perspective:
+//        P.perspective(75.0f,4.0f/3.0f,0.1f,10.0f);
+//    case Camera::two_dimensions:
+//        P.ortho(-10,10,-10,10,-1,1);
+//    default:
+//        break;
+//    }
+//    camera.set_projection_matrix(P);
+
+//    updateProjectionMatrix(P);
 }
 
 void Viewer::startShaders(){
@@ -154,55 +155,34 @@ void Viewer::display3DObjects(){
 }
 
 void Viewer::bindProgram(){
-//    if (GlobalConfig::is_enabled("shaders_activated"))
-//    bindProgram();
+    _program->bind();
 }
 
 void Viewer::releaseProgram(){
-//    if (GlobalConfig::is_enabled("shaders_activated"))
-//    releaseProgram();
-
+    _program->release();
 }
 
 void Viewer::updateModelMatrix(const QMatrix4x4 M){
-//    if (GlobalConfig::is_enabled("shaders")){
     const QMatrix4x4& V=_ui->get_camera().get_view_matrix();
     const QMatrix4x4& P=_ui->get_camera().get_projection_matrix();
     _model_matrix = M;
     _program->setUniformValue("M",M);
     _program->setUniformValue("pvm",P*V*M);
-//    }
 }
 void Viewer::updateProjectionMatrix(const QMatrix4x4 P){
-//    if (GlobalConfig::is_enabled("shaders")){
     const QMatrix4x4& V=_ui->get_camera().get_view_matrix();
     _ui->get_camera().set_projection_matrix(P);
     _program->setUniformValue("P",P);
     _program->setUniformValue("pvm",P*V*_model_matrix);
-//    }
 }
 void Viewer::updateViewMatrix(const QMatrix4x4 V){
-//    if (GlobalConfig::is_enabled("shaders")){
     const QMatrix4x4& P=_ui->get_camera().get_projection_matrix();
     _ui->get_camera().set_view_matrix(V);
     _program->setUniformValue("V",V);
     _program->setUniformValue("pvm",P*V*_model_matrix);
-//    }
 }
-//void Viewer::updateViewMatrix(){
-
-//}
-//void Viewer::updateProjectionMatrix(){
-//    if (GlobalConfig::is_enabled("shaders")){
-//        _program->setUniformValue("M",M);
-//        _program->setUniformValue("V",V);
-//        _program->setUniformValue("P",P);
-//        _program->setUniformValue("pvm",P*V*M);
-//    }
-//}
 
 void Viewer::updateMatrices(const QMatrix4x4& P,const QMatrix4x4& V,const QMatrix4x4& M){
-//    if (GlobalConfig::is_enabled("shaders")){
     _ui->get_camera().set_view_matrix(V);
     _ui->get_camera().set_projection_matrix(P);
     _model_matrix = M;
@@ -210,45 +190,6 @@ void Viewer::updateMatrices(const QMatrix4x4& P,const QMatrix4x4& V,const QMatri
     _program->setUniformValue("V",V);
     _program->setUniformValue("P",P);
     _program->setUniformValue("pvm",P*V*M);
-//    } else {
-//        GLfloat matrix[16];
-//#ifdef QT_4_
-//        const qreal* data = (P).transposed().data();
-//#else
-//        const float* data = (P).transposed().data();
-//#endif
-//        for (int i = 0; i < 16; ++i) {
-//            matrix[i] = data[i];
-//        }
-//        debugDataGL(matrix);
-//        glMatrixMode(GL_PROJECTION);
-//        glLoadIdentity();
-//        glMultMatrixf(matrix);
-//        GLfloat m[16];
-//        glGetFloatv (GL_PROJECTION_MATRIX, m);
-//        glGetFloatv (GL_PROJECTION_MATRIX, m);
-//#ifdef QT_4_
-//        const qreal* data2= (M*V).data();
-//#else
-//        const float* data2= (M*V).data();
-//#endif
-//        for (int i = 0; i < 16; ++i) {
-//            matrix[i] = data2[i];
-//        }
-//        glMatrixMode(GL_MODELVIEW);
-//        glLoadIdentity();
-//    }
-}
-
-void Viewer::debugData(const qreal* data){
-    for (int i = 0; i < 4; ++i) {
-        qDebug()<<data[i*4]<<" "<<data[i*4 +1]<<" "<<data[i*4 +2]<<" "<<data[i*4 +3]<<" ";
-    }
-}
-void Viewer::debugDataGL(const GLfloat* data){
-    for (int i = 0; i < 4; ++i) {
-        qDebug()<<data[i*4]<<" "<<data[i*4 +1]<<" "<<data[i*4 +2]<<" "<<data[i*4 +3]<<" ";
-    }
 }
 
 void Viewer::displayFullTextured(int x, int y, int width, int height){
@@ -336,7 +277,6 @@ void Viewer::init()
     _input->set_ui(_ui);
 
     glClearColor(0.2,0.2,0.2,1);
-//    if(GlobalConfig::is_enabled("shaders"))
     startShaders();
     _timer_fps= new QTimer();
     _timer_fps->setInterval(1000);
@@ -351,11 +291,6 @@ void Viewer::init()
     _timer_start->start(Timing::fps_delta_time);
 
     _time.start();
-    QMatrix4x4 P;
-    P.ortho(-1,1,-1,1,-1,1);
-    P.perspective(90,4/3,.1,1);
-    _ui->get_camera().set_projection_matrix(P);
-//    _program->setUniformValue("P",P);
     _initiated = true;
 }
 
@@ -420,8 +355,5 @@ void Viewer::keyReleaseEvent(QKeyEvent *keyEvent)
 }
 
 void Viewer::closeEvent(QCloseEvent * event){
-
-
-//    QGLViewer::closeEvent(event);
 }
 

@@ -1,31 +1,18 @@
 #include "uistate.h"
 
 UIState::UIState():
-    QObject()/*,
-    _position( 0,-5.5,1)*/
+    QObject()
 {
     _action_done=false;
     for (int i=0;i<NUMBER_OF_ACTIONS;i++) _actions[i]=false;
     _paused=false;
-    loadPreviousState();
     _progressive_zoom._targeted=_zoom_level;
     _progressive_zoom._activated = false;
     _progressive_zoom._speed = 1;
     _camera.set_position(Point3df(0,0,-1.0));
     QQuaternion quat = QQuaternion::fromAxisAndAngle(1,0,0,15);
     _camera.set_rotation(quat);
-    fov=90;
 }
-
-
-//not working
-void UIState::loadPreviousState(){
-}
-
-//not working
-void UIState::saveState(){
-}
-
 UIState::~UIState(){
 }
 
@@ -41,13 +28,7 @@ void UIState::changeZoom(int delta){
         else if (_progressive_zoom._targeted+delta < 0) _progressive_zoom._targeted = 0 ;
         else _progressive_zoom._targeted = _progressive_zoom._targeted+delta;
     }
-        displayCameraInformation();
 }
-
-void UIState::displayCameraInformation(){
-    qDebug()<<"zoom :"<<_zoom_level;
-}
-
 
 void UIState::rotate(QPoint mouse_coordinates){
     float xangle,yangle;
@@ -77,10 +58,12 @@ void UIState::actionProcess(){
                 _camera.move(Point3df(-.1,0,0));
                 break;
             case up:
-                _camera.move(Point3df(0,-.1,0));
+                _camera.move(Point3df(0,0,-.1));
+//                _camera.move(Point3df(0,-.1,0));
                 break;
             case down:
-                _camera.move(Point3df(0,.1,0));
+//                _camera.move(Point3df(0,.1,0));
+                _camera.move(Point3df(0,0,.1));
                 break;
             case forward:
                 changeZoom(5);
@@ -96,10 +79,6 @@ void UIState::actionProcess(){
                 q = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0),1);
                 _camera.set_rotation( q*_camera.get_rotation());
                 break;
-            case e_:
-                fov--;
-                qDebug()<<fov;
-                break ;
             }
         }
     }
@@ -113,6 +92,6 @@ void UIState::actionProcess(){
 }
 
 
-bool UIState::action_going (int action){
+bool UIState::hasActionGoing (int action){
     return _actions[action];
 }

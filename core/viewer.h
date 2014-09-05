@@ -38,9 +38,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <QGLShader>
 #include <QVector3D>
 
-//#include <QGLViewer/qglviewer.h>
-//#include <QGLViewer/vec.h>
-
 #include <string>
 #include <iostream>
 #include "core/core.h"
@@ -56,10 +53,8 @@ public:
     Viewer(const QGLFormat &format);
     Viewer(QGLContext * context);
     Viewer(QWidget * parent = 0, const QGLWidget * shareWidget = 0, Qt::WindowFlags f = 0);
-//    Viewer(QWidget * parent = 0, const QGLWidget * shareWidget = 0, Qt::WindowFlags f = 0 ) : QGLWidget ( parent, shareWidget,f ){__build();}
     ~Viewer();
     void deleteData();
-//    bool _main_viewer;
 
     QVector<GLuint> textures() const;
     void setTextures(const QVector<GLuint> &textures);
@@ -68,8 +63,6 @@ public:
 public slots :
     void framepersecond();
     void animate();
-
-
 protected :
     void updateProjection();
     virtual void draw();
@@ -140,11 +133,7 @@ private :
     void updateLastMousePosition(const QPoint& position){
         _last_position = position;
     }
-
-
     bool _initiated;
-    void debugData(const qreal* data);
-    void debugDataGL(const GLfloat *data);
 
 };
 #endif // VIEWER_H

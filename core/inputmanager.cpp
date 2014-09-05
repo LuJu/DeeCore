@@ -1,10 +1,5 @@
 #include "inputmanager.h"
 
-//InputManager * InputManager::instance(){
-//    static InputManager _instance;
-//    return & _instance;
-//}
-
 const int InputManager::_default_keyboard_matching[NUMBER_OF_KEYS]={
     Qt::Key_Left,
     Qt::Key_Right,
@@ -31,7 +26,6 @@ InputManager::InputManager()
     _keyboard_activated=true;
     _mouse_activated=true;
     _mouse_left_dragging=false;
-//    _ui = UIState::instance();
     resetAssignment();
 }
 
