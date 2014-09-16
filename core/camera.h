@@ -85,9 +85,15 @@ public:
 
     void recomputeViewMatrix() {
         _view.setToIdentity();
-        _view.translate(_position.x(),_position.y(),_position.z());
-        _view.scale(_scale.x(),_scale.y(),_scale.z());
         _view.rotate(_rotation);
+        _view.translate(_position.x(),_position.y(),_position.z());
+//        _view.scale(_scale.x(),_scale.y(),_scale.z());
+    }
+
+    Point3df get_looking_direction() const {
+        QVector3D direction(0,0,1);
+        direction = _rotation.rotatedVector(direction);
+        return Point3df(direction.x(),direction.y(),direction.z());
     }
 
     const QQuaternion& get_rotation() const {

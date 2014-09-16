@@ -79,7 +79,6 @@ public:
     void saveState();
     void changeZoom(int delta);
 
-    QQuaternion _quaternion;
     void rotate(QPoint mouse_coordinates);
     UIState();
     ~UIState();

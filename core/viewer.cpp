@@ -46,46 +46,32 @@ void Viewer::draw()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
-
-    QMatrix4x4 V,P;
-    float scale = (((float)_ui->get_zoom())/100)+1.0f;
-
-    Camera& camera = _ui->get_camera();
-    camera.set_scale(Point3df(1,1,1));
-    camera.set_scale(Point3df(scale,scale,scale));
-    V = camera.get_view_matrix();
-
-    updateProjection();
 }
 
 void Viewer::resizeGL(int width, int height){
-//    QMatrix4x4 P;
-//    P.perspective(_ui->fov,4.0f/3.0f,0.0001f,10000000.0f);
-//    _ui->get_camera().set_projection_matrix(P);
-//    int side = qMin(width, height);
-//    glViewport(0,0, width, height);
-//    updateProjection();
-
     float window_width = width;
     float window_height = height;
     float frame_width = window_width / 100.f;
     float frame_height = window_height / 100.f;
+    float aspect_ratio = window_width / window_height;
     Camera& camera = _ui->get_camera();
+    glViewport(0,0,width,height);
     QMatrix4x4 P;
     switch (camera.get_projection_type()) {
     case Camera::orthographic:
         P.ortho(-frame_width/2,frame_width/2,1 - frame_height/2 ,1 + frame_height/2,-1000,1000);
-//        P.ortho(-10,10,-10,10,-1000,1000);
+//        P.ortho(-100,100,-100,100,-1000,1000);
         break;
     case Camera::perspective:
-        P.perspective(75.0f,4.0f/3.0f,0.1f,10.0f);
+        P.perspective(18.0f,aspect_ratio,.1f,10000.0f);
     case Camera::two_dimensions:
         P.ortho(-10,10,-10,10,-1,1);
     default:
         break;
+
     }
     camera.set_projection_matrix(P);
-    updateProjectionMatrix(P);
+//    updateProjectionMatrix(P);
 }
 void Viewer::updateProjection(){
 //    float window_width = width();
@@ -144,12 +130,14 @@ QGLShader * Viewer::compileShader(const char * path, QGLShader::ShaderType type)
 }
 
 void Viewer::display3DObjects(){
+    QMatrix4x4 M,V,P;
+    V = _ui->get_camera().get_view_matrix();
+    P = _ui->get_camera().get_projection_matrix();
+    updateMatrices(P,V,M);
     for(int i = 0; i< _3D_display_list.size(); i++){
-        QMatrix4x4 M,V,P;
-        V = _ui->get_camera().get_view_matrix();
-        P = _ui->get_camera().get_projection_matrix();
         M = _3D_display_list[i]->get_matrix();
-        updateMatrices(P,V,M);
+        updateModelMatrix(M);
+//        updateMatrices(P,V,M);
         _3D_display_list[i]->render();
     }
 }
@@ -174,12 +162,20 @@ void Viewer::updateProjectionMatrix(const QMatrix4x4 P){
     _ui->get_camera().set_projection_matrix(P);
     _program->setUniformValue("P",P);
     _program->setUniformValue("pvm",P*V*_model_matrix);
+//    QVector3D position(_ui->get_camera().get_position().x(),
+//                       _ui->get_camera().get_position().y(),
+//                       _ui->get_camera().get_position().z());
+//    _program->setUniformValue("_camera_position",position);
 }
 void Viewer::updateViewMatrix(const QMatrix4x4 V){
     const QMatrix4x4& P=_ui->get_camera().get_projection_matrix();
     _ui->get_camera().set_view_matrix(V);
     _program->setUniformValue("V",V);
     _program->setUniformValue("pvm",P*V*_model_matrix);
+    QVector3D position(_ui->get_camera().get_position().x(),
+                       _ui->get_camera().get_position().y(),
+                       _ui->get_camera().get_position().z());
+    _program->setUniformValue("_camera_position",position);
 }
 
 void Viewer::updateMatrices(const QMatrix4x4& P,const QMatrix4x4& V,const QMatrix4x4& M){
@@ -190,6 +186,15 @@ void Viewer::updateMatrices(const QMatrix4x4& P,const QMatrix4x4& V,const QMatri
     _program->setUniformValue("V",V);
     _program->setUniformValue("P",P);
     _program->setUniformValue("pvm",P*V*M);
+    QVector3D position(_ui->get_camera().get_position().x(),
+                       _ui->get_camera().get_position().y(),
+                       _ui->get_camera().get_position().z());
+    _program->setUniformValue("_camera_position",position);
+//    QVector3D direction = _ui->get_camera().get_looking_direction();
+    QVector3D direction(_ui->get_camera().get_looking_direction().x(),
+                       _ui->get_camera().get_looking_direction().y(),
+                       _ui->get_camera().get_looking_direction().z());
+    _program->setUniformValue("_camera_direction",direction);
 }
 
 void Viewer::displayFullTextured(int x, int y, int width, int height){
@@ -285,10 +290,13 @@ void Viewer::init()
     _frame=0;
     _current_fps = 0;
     _background_activated=false;
+//    resize(1024,768);
 
     _timer_start = new QTimer(this);
     connect(_timer_start, SIGNAL(timeout()), this, SLOT(animate()));
     _timer_start->start(Timing::fps_delta_time);
+
+    _ui->get_camera().set_scale(Point3df(1,1,1));
 
     _time.start();
     _initiated = true;
