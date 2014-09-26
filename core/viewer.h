@@ -27,6 +27,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef VIEWER_H
 #define VIEWER_H
 
+
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
